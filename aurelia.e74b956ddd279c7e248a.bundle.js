@@ -4,7 +4,7 @@ webpackJsonp([1],{
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_pal__ = __webpack_require__(27);
 /* harmony export (binding) */ __webpack_require__.d(exports, "TaskQueue", function() { return TaskQueue; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -197,11 +197,11 @@ function filterFlushStack(stack) {
 
 /***/ },
 
-/***/ 1021:
+/***/ 1034:
 /***/ function(module, exports, __webpack_require__) {
 
 __webpack_require__("aurelia-binding");
-__webpack_require__(27);
+__webpack_require__(24);
 __webpack_require__("aurelia-event-aggregator");
 __webpack_require__("aurelia-framework");
 __webpack_require__(157);
@@ -284,16 +284,16 @@ var History = function () {
 
 /***/ },
 
-/***/ 27:
+/***/ 24:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_metadata__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(27);
 /* harmony export (binding) */ __webpack_require__.d(exports, "_emptyParameters", function() { return _emptyParameters; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "InvocationHandler", function() { return InvocationHandler; });
+/* harmony export (binding) */ __webpack_require__.d(exports, "Container", function() { return Container; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "newInstance", function() { return newInstance; });
-/* harmony export (binding) */ __webpack_require__.d(exports, "autoinject", function() { return autoinject; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "inject", function() { return inject; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "invoker", function() { return invoker; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "invokeAsFactory", function() { return invokeAsFactory; });
@@ -304,6 +304,7 @@ var History = function () {
 /* harmony export (binding) */ __webpack_require__.d(exports, "TransientRegistration", function() { return TransientRegistration; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "SingletonRegistration", function() { return SingletonRegistration; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "resolver", function() { return resolver; });
+/* harmony export (binding) */ __webpack_require__.d(exports, "Strategy", function() { return Strategy; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "StrategyResolver", function() { return StrategyResolver; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "Lazy", function() { return Lazy; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "All", function() { return All; });
@@ -317,7 +318,7 @@ var History = function () {
 /* harmony export (binding) */ __webpack_require__.d(exports, "optional", function() { return optional; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "parent", function() { return parent; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "factory", function() { return factory; });
-/* harmony export (binding) */ __webpack_require__.d(exports, "Container", function() { return Container; });
+/* harmony export (binding) */ __webpack_require__.d(exports, "autoinject", function() { return autoinject; });
 
 
 
@@ -396,6 +397,15 @@ var resolver = __WEBPACK_IMPORTED_MODULE_0_aurelia_metadata__["protocol"].create
     }
     return true;
 });
+var Strategy;
+(function (Strategy) {
+    Strategy[Strategy["instance"] = 0] = "instance";
+    Strategy[Strategy["singleton"] = 1] = "singleton";
+    Strategy[Strategy["transient"] = 2] = "transient";
+    Strategy[Strategy["function"] = 3] = "function";
+    Strategy[Strategy["array"] = 4] = "array";
+    Strategy[Strategy["alias"] = 5] = "alias";
+})(Strategy || (Strategy = {}));
 function isStrategy(actual, expected, state) {
     return actual === expected;
 }
@@ -405,25 +415,25 @@ var StrategyResolver = (function () {
         this.state = state;
     }
     StrategyResolver.prototype.get = function (container, key) {
-        if (isStrategy(this.strategy, 0, this.state)) {
+        if (isStrategy(this.strategy, Strategy.instance, this.state)) {
             return this.state;
         }
-        if (isStrategy(this.strategy, 1, this.state)) {
+        if (isStrategy(this.strategy, Strategy.singleton, this.state)) {
             var singleton = container.invoke(this.state);
             this.state = singleton;
             this.strategy = 0;
             return singleton;
         }
-        if (isStrategy(this.strategy, 2, this.state)) {
+        if (isStrategy(this.strategy, Strategy.transient, this.state)) {
             return container.invoke(this.state);
         }
-        if (isStrategy(this.strategy, 3, this.state)) {
+        if (isStrategy(this.strategy, Strategy.function, this.state)) {
             return this.state(container, key, this);
         }
-        if (isStrategy(this.strategy, 4, this.state)) {
+        if (isStrategy(this.strategy, Strategy.array, this.state)) {
             return this.state[0].get(container, key);
         }
-        if (isStrategy(this.strategy, 5, this.state)) {
+        if (isStrategy(this.strategy, Strategy.alias, this.state)) {
             return container.get(this.state);
         }
         throw new Error('Invalid strategy: ' + this.strategy);
@@ -521,7 +531,7 @@ var Factory = (function () {
     Factory.prototype.get = function (container) {
         var fn = this._key;
         var resolver = container.getResolver(fn);
-        if (resolver && resolver.strategy === 3) {
+        if (resolver && resolver.strategy === Strategy.function) {
             fn = resolver.state;
         }
         return function () {
@@ -973,11 +983,11 @@ var SingletonRegistration = (function () {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Promise) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__ = __webpack_require__(50);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_metadata__ = __webpack_require__(41);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_pal__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_loader__ = __webpack_require__(86);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_path__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_aurelia_binding__ = __webpack_require__("aurelia-binding");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_aurelia_task_queue__ = __webpack_require__(102);
 /* harmony export (binding) */ __webpack_require__.d(exports, "animationEvent", function() { return animationEvent; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "Animator", function() { return Animator; });
@@ -1049,7 +1059,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _class, _temp, _class2, _temp2, _dec, _class3, _dec2, _class4, _dec3, _class5, _dec4, _class6, _dec5, _class7, _dec6, _class8, _class9, _temp3, _class10, _temp4, _class12, _dec7, _class14, _dec8, _class15, _class16, _temp5, _dec9, _class17, _dec10, _class18, _dec11, _class19;
+var _class, _temp, _class2, _temp2, _dec, _class3, _dec2, _class4, _dec3, _class5, _dec4, _class6, _dec5, _class7, _dec6, _class8, _class9, _temp3, _class10, _temp4, _class12, _class14, _temp5, _dec7, _class15, _dec8, _class16, _dec9, _class17;
 
 
 
@@ -1934,7 +1944,9 @@ var PassThroughSlot = function () {
     this.destinationName = destinationName;
     this.fallbackFactory = fallbackFactory;
     this.destinationSlot = null;
+
     this.projections = 0;
+
     this.contentView = null;
 
     var attr = new SlotCustomAttribute(this.anchor);
@@ -2045,6 +2057,7 @@ var ShadowSlot = function () {
     this.fallbackFactory = fallbackFactory;
     this.contentView = null;
     this.projections = 0;
+
     this.children = [];
     this.projectFromAnchors = null;
     this.destinationSlots = null;
@@ -2090,6 +2103,7 @@ var ShadowSlot = function () {
       });
       if (found) {
         var _children = found.auProjectionChildren;
+        var ownChildren = this.children;
 
         for (var i = 0, ii = _children.length; i < ii; ++i) {
           var _child = _children[i];
@@ -2098,7 +2112,12 @@ var ShadowSlot = function () {
             _children.splice(i, 1);
             view.fragment.appendChild(_child);
             i--;ii--;
+
             this.projections--;
+            var idx = ownChildren.indexOf(_child);
+            if (idx > -1) {
+              ownChildren.splice(idx, 1);
+            }
           }
         }
 
@@ -2121,10 +2140,17 @@ var ShadowSlot = function () {
 
       if (found) {
         var _children2 = found.auProjectionChildren;
+        var ownChildren = this.children;
+
         for (var i = 0, ii = _children2.length; i < ii; ++i) {
           var _child2 = _children2[i];
           _child2.auOwnerView.fragment.appendChild(_child2);
+
           this.projections--;
+          var idx = ownChildren.indexOf(_child2);
+          if (idx > -1) {
+            ownChildren.splice(idx, 1);
+          }
         }
 
         found.auProjectionChildren = [];
@@ -3760,7 +3786,11 @@ function makeShadowSlot(compiler, resources, node, instructions, parentInjectorI
 
 var defaultLetHandler = BindingLanguage.prototype.createLetExpressions;
 
-var ViewCompiler = (_dec7 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(BindingLanguage, ViewResources), _dec7(_class14 = function () {
+var ViewCompiler = function () {
+  ViewCompiler.inject = function inject() {
+    return [BindingLanguage, ViewResources];
+  };
+
   function ViewCompiler(bindingLanguage, resources) {
     
 
@@ -4177,7 +4207,7 @@ var ViewCompiler = (_dec7 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_au
   };
 
   return ViewCompiler;
-}()) || _class14);
+}();
 
 var ResourceModule = function () {
   function ResourceModule(moduleId) {
@@ -4466,7 +4496,11 @@ var ProxyViewFactory = function () {
 
 var auSlotBehavior = null;
 
-var ViewEngine = (_dec8 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_loader__["Loader"], __WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["Container"], ViewCompiler, ModuleAnalyzer, ViewResources), _dec8(_class15 = (_temp5 = _class16 = function () {
+var ViewEngine = (_temp5 = _class14 = function () {
+  ViewEngine.inject = function inject() {
+    return [__WEBPACK_IMPORTED_MODULE_3_aurelia_loader__["Loader"], __WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["Container"], ViewCompiler, ModuleAnalyzer, ViewResources];
+  };
+
   function ViewEngine(loader, container, viewCompiler, moduleAnalyzer, appResources) {
     
 
@@ -4655,7 +4689,7 @@ var ViewEngine = (_dec8 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aure
   };
 
   return ViewEngine;
-}(), _class16.viewModelRequireMetadataKey = 'aurelia:view-model-require', _temp5)) || _class15);
+}(), _class14.viewModelRequireMetadataKey = 'aurelia:view-model-require', _temp5);
 
 var Controller = function () {
   function Controller(behavior, instruction, viewModel, container) {
@@ -4828,7 +4862,7 @@ var Controller = function () {
   return Controller;
 }();
 
-var BehaviorPropertyObserver = (_dec9 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5_aurelia_binding__["subscriberCollection"])(), _dec9(_class17 = function () {
+var BehaviorPropertyObserver = (_dec7 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5_aurelia_binding__["subscriberCollection"])(), _dec7(_class15 = function () {
   function BehaviorPropertyObserver(taskQueue, obj, propertyName, selfSubscriber, initialValue) {
     
 
@@ -4890,7 +4924,7 @@ var BehaviorPropertyObserver = (_dec9 = __webpack_require__.i(__WEBPACK_IMPORTED
   };
 
   return BehaviorPropertyObserver;
-}()) || _class17);
+}()) || _class15);
 
 function getObserver(instance, name) {
   var lookup = instance.__observers__;
@@ -5579,6 +5613,7 @@ function trackMutation(groupedMutations, binder, record) {
 function onChildChange(mutations, observer) {
   var binders = observer.binders;
   var bindersLength = binders.length;
+
   var groupedMutations = new Map();
 
   for (var _i10 = 0, _ii9 = mutations.length; _i10 < _ii9; ++_i10) {
@@ -5591,6 +5626,7 @@ function onChildChange(mutations, observer) {
       if (_node.nodeType === 1) {
         for (var k = 0; k < bindersLength; ++k) {
           var binder = binders[k];
+
           if (binder.onRemove(_node)) {
             trackMutation(groupedMutations, binder, record);
           }
@@ -5603,6 +5639,7 @@ function onChildChange(mutations, observer) {
       if (_node2.nodeType === 1) {
         for (var _k = 0; _k < bindersLength; ++_k) {
           var _binder = binders[_k];
+
           if (_binder.onAdd(_node2)) {
             trackMutation(groupedMutations, _binder, record);
           }
@@ -5611,9 +5648,9 @@ function onChildChange(mutations, observer) {
     }
   }
 
-  groupedMutations.forEach(function (value, key) {
-    if (key.changeHandler !== null) {
-      key.viewModel[key.changeHandler](value);
+  groupedMutations.forEach(function (mutationRecords, binder) {
+    if (binder.isBound && binder.changeHandler !== null) {
+      binder.viewModel[binder.changeHandler](mutationRecords);
     }
   });
 }
@@ -5623,6 +5660,7 @@ var ChildObserverBinder = function () {
     
 
     this.selector = selector;
+
     this.viewHost = viewHost;
     this.property = property;
     this.viewModel = viewModel;
@@ -5636,6 +5674,8 @@ var ChildObserverBinder = function () {
     } else {
       this.contentView = null;
     }
+    this.source = null;
+    this.isBound = false;
   }
 
   ChildObserverBinder.prototype.matches = function matches(element) {
@@ -5666,6 +5706,14 @@ var ChildObserverBinder = function () {
   };
 
   ChildObserverBinder.prototype.bind = function bind(source) {
+    if (this.isBound) {
+      if (this.source === source) {
+        return;
+      }
+      this.source = source;
+    }
+    this.isBound = true;
+
     var viewHost = this.viewHost;
     var viewModel = this.viewModel;
     var observer = viewHost.__childObserver__;
@@ -5740,7 +5788,14 @@ var ChildObserverBinder = function () {
         return true;
       }
 
-      return false;
+      var currentValue = this.viewModel[this.property];
+      if (currentValue === _value2) {
+        this.viewModel[this.property] = null;
+
+        if (this.isBound && this.changeHandler !== null) {
+          this.viewModel[this.changeHandler](_value2);
+        }
+      }
     }
 
     return false;
@@ -5775,7 +5830,7 @@ var ChildObserverBinder = function () {
 
       this.viewModel[this.property] = _value3;
 
-      if (this.changeHandler !== null) {
+      if (this.isBound && this.changeHandler !== null) {
         this.viewModel[this.changeHandler](_value3);
       }
     }
@@ -5784,10 +5839,28 @@ var ChildObserverBinder = function () {
   };
 
   ChildObserverBinder.prototype.unbind = function unbind() {
-    if (this.viewHost.__childObserver__) {
-      this.viewHost.__childObserver__.disconnect();
-      this.viewHost.__childObserver__ = null;
-      this.viewModel[this.property] = null;
+    if (!this.isBound) {
+      return;
+    }
+    this.isBound = false;
+    this.source = null;
+    var childObserver = this.viewHost.__childObserver__;
+    if (childObserver) {
+      var binders = childObserver.binders;
+      if (binders && binders.length) {
+        var idx = binders.indexOf(this);
+        if (idx !== -1) {
+          binders.splice(idx, 1);
+        }
+        if (binders.length === 0) {
+          childObserver.disconnect();
+          this.viewHost.__childObserver__ = null;
+        }
+      }
+
+      if (this.usesShadowDOM) {
+        this.viewModel[this.property] = null;
+      }
     }
   };
 
@@ -5820,7 +5893,7 @@ function tryActivateViewModel(context) {
   return context.viewModel.activate(context.model) || Promise.resolve();
 }
 
-var CompositionEngine = (_dec10 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(ViewEngine, ViewLocator), _dec10(_class18 = function () {
+var CompositionEngine = (_dec8 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(ViewEngine, ViewLocator), _dec8(_class16 = function () {
   function CompositionEngine(viewEngine, viewLocator) {
     
 
@@ -5986,7 +6059,7 @@ var CompositionEngine = (_dec10 = __webpack_require__.i(__WEBPACK_IMPORTED_MODUL
   };
 
   return CompositionEngine;
-}()) || _class18);
+}()) || _class16);
 
 var ElementConfigResource = function () {
   function ElementConfigResource() {
@@ -6199,7 +6272,7 @@ function viewResources() {
   };
 }
 
-var TemplatingEngine = (_dec11 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["Container"], ModuleAnalyzer, ViewCompiler, CompositionEngine), _dec11(_class19 = function () {
+var TemplatingEngine = (_dec9 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_6_aurelia_dependency_injection__["Container"], ModuleAnalyzer, ViewCompiler, CompositionEngine), _dec9(_class17 = function () {
   function TemplatingEngine(container, moduleAnalyzer, viewCompiler, compositionEngine) {
     
 
@@ -6243,7 +6316,7 @@ var TemplatingEngine = (_dec11 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE
   };
 
   return TemplatingEngine;
-}()) || _class19);
+}()) || _class17);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__("bluebird")))
 
 /***/ },
@@ -6452,7 +6525,7 @@ var Logger = function () {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_task_queue__ = __webpack_require__(102);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_metadata__ = __webpack_require__(41);
 /* harmony export (binding) */ __webpack_require__.d(exports, "getArrayObserver", function() { return _getArrayObserver; });
@@ -9773,7 +9846,7 @@ var ModifyMapObserver = function (_ModifyCollectionObse2) {
 var emLogger = __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__["getLogger"]('event-manager');
 
 function findOriginalEventTarget(event) {
-  return event.path && event.path[0] || event.deepPath && event.deepPath[0] || event.target;
+  return event.composedPath && event.composedPath()[0] || event.deepPath && event.deepPath()[0] || event.path && event.path[0] || event.target;
 }
 
 function stopPropagation() {
@@ -10313,7 +10386,7 @@ var SetterObserver = (_dec6 = subscriberCollection(), _dec6(_class7 = function (
 
   SetterObserver.prototype.call = function call() {
     var oldValue = this.oldValue;
-    var newValue = this.currentValue;
+    var newValue = this.oldValue = this.currentValue;
 
     this.queued = false;
 
@@ -12317,10 +12390,10 @@ function configure(config) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Promise) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_loader__ = __webpack_require__(86);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_pal__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_aurelia_path__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_aurelia_binding__ = __webpack_require__("aurelia-binding");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_aurelia_metadata__ = __webpack_require__(41);
@@ -12329,8 +12402,8 @@ function configure(config) {
 /* harmony export (binding) */ __webpack_require__.d(exports, "FrameworkConfiguration", function() { return FrameworkConfiguration; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "_emptyParameters", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["_emptyParameters"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "InvocationHandler", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["InvocationHandler"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "Container", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["Container"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "newInstance", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["newInstance"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "autoinject", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["autoinject"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "inject", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["inject"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "invoker", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["invoker"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "invokeAsFactory", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["invokeAsFactory"]; });
@@ -12341,6 +12414,7 @@ function configure(config) {
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "TransientRegistration", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["TransientRegistration"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "SingletonRegistration", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["SingletonRegistration"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "resolver", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["resolver"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "Strategy", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["Strategy"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "StrategyResolver", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["StrategyResolver"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "Lazy", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["Lazy"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "All", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["All"]; });
@@ -12354,7 +12428,7 @@ function configure(config) {
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "optional", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["optional"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "parent", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["parent"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "factory", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["factory"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "Container", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["Container"]; });
+/* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "autoinject", function() { return __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__["autoinject"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "getArrayObserver", function() { return __WEBPACK_IMPORTED_MODULE_6_aurelia_binding__["getArrayObserver"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "getMapObserver", function() { return __WEBPACK_IMPORTED_MODULE_6_aurelia_binding__["getMapObserver"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(exports, "getSetObserver", function() { return __WEBPACK_IMPORTED_MODULE_6_aurelia_binding__["getSetObserver"]; });
@@ -13027,7 +13101,7 @@ const LogManager = __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_history__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(27);
 /* harmony export (binding) */ __webpack_require__.d(exports, "BrowserHistory", function() { return BrowserHistory; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "DefaultLinkHandler", function() { return DefaultLinkHandler; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "LinkHandler", function() { return LinkHandler; });
@@ -13905,7 +13979,7 @@ function addSegment(currentState, segment) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(Promise) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_logging__ = __webpack_require__(50);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_dependency_injection__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_history__ = __webpack_require__(157);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_route_recognizer__ = __webpack_require__("aurelia-route-recognizer");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_event_aggregator__ = __webpack_require__("aurelia-event-aggregator");
@@ -17031,8 +17105,8 @@ function configure(config) {
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Promise) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(26);
+/* WEBPACK VAR INJECTION */(function(Promise) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_task_queue__ = __webpack_require__(102);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__ = __webpack_require__("aurelia-binding");
@@ -17102,6 +17176,20 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
 
 function __decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -17115,8 +17203,8 @@ var ActivationStrategy;
     ActivationStrategy["InvokeLifecycle"] = "invoke-lifecycle";
     ActivationStrategy["Replace"] = "replace";
 })(ActivationStrategy || (ActivationStrategy = {}));
-let Compose = class Compose {
-    constructor(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
+var Compose = (function () {
+    function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
         this.activationStrategy = ActivationStrategy.InvokeLifecycle;
         this.element = element;
         this.container = container;
@@ -17128,65 +17216,66 @@ let Compose = class Compose {
         this.currentViewModel = null;
         this.changes = Object.create(null);
     }
-    static inject() {
+    Compose.inject = function () {
         return [__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].Element, __WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["Container"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["CompositionEngine"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewResources"], __WEBPACK_IMPORTED_MODULE_2_aurelia_task_queue__["TaskQueue"]];
-    }
-    created(owningView) {
+    };
+    Compose.prototype.created = function (owningView) {
         this.owningView = owningView;
-    }
-    bind(bindingContext, overrideContext) {
+    };
+    Compose.prototype.bind = function (bindingContext, overrideContext) {
         this.bindingContext = bindingContext;
         this.overrideContext = overrideContext;
-        let changes = this.changes;
+        var changes = this.changes;
         changes.view = this.view;
         changes.viewModel = this.viewModel;
         changes.model = this.model;
         if (!this.pendingTask) {
             processChanges(this);
         }
-    }
-    unbind() {
+    };
+    Compose.prototype.unbind = function () {
         this.changes = Object.create(null);
         this.bindingContext = null;
         this.overrideContext = null;
-        let returnToCache = true;
-        let skipAnimation = true;
+        var returnToCache = true;
+        var skipAnimation = true;
         this.viewSlot.removeAll(returnToCache, skipAnimation);
-    }
-    modelChanged(newValue, oldValue) {
+    };
+    Compose.prototype.modelChanged = function (newValue, oldValue) {
         this.changes.model = newValue;
         requestUpdate(this);
-    }
-    viewChanged(newValue, oldValue) {
+    };
+    Compose.prototype.viewChanged = function (newValue, oldValue) {
         this.changes.view = newValue;
         requestUpdate(this);
-    }
-    viewModelChanged(newValue, oldValue) {
+    };
+    Compose.prototype.viewModelChanged = function (newValue, oldValue) {
         this.changes.viewModel = newValue;
         requestUpdate(this);
-    }
-};
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Compose.prototype, "model", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Compose.prototype, "view", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Compose.prototype, "viewModel", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Compose.prototype, "activationStrategy", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Compose.prototype, "swapOrder", void 0);
-Compose = __decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["noView"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customElement"])('compose')
-], Compose);
+    };
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Compose.prototype, "model", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Compose.prototype, "view", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Compose.prototype, "viewModel", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Compose.prototype, "activationStrategy", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Compose.prototype, "swapOrder", void 0);
+    Compose = __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["noView"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customElement"])('compose')
+    ], Compose);
+    return Compose;
+}());
 function isEmpty(obj) {
-    for (const _ in obj) {
+    for (var _ in obj) {
         return false;
     }
     return true;
@@ -17210,17 +17299,17 @@ function createInstruction(composer, instruction) {
     });
 }
 function processChanges(composer) {
-    const changes = composer.changes;
+    var changes = composer.changes;
     composer.changes = Object.create(null);
     if (needsReInitialization(composer, changes)) {
-        let instruction = {
+        var instruction = {
             view: composer.view,
             viewModel: composer.currentViewModel || composer.viewModel,
             model: composer.model
         };
         instruction = Object.assign(instruction, changes);
         instruction = createInstruction(composer, instruction);
-        composer.pendingTask = composer.compositionEngine.compose(instruction).then(controller => {
+        composer.pendingTask = composer.compositionEngine.compose(instruction).then(function (controller) {
             composer.currentController = controller;
             composer.currentViewModel = controller ? controller.viewModel : null;
         });
@@ -17232,9 +17321,9 @@ function processChanges(composer) {
         }
     }
     composer.pendingTask = composer.pendingTask
-        .then(() => {
+        .then(function () {
         completeCompositionTask(composer);
-    }, reason => {
+    }, function (reason) {
         completeCompositionTask(composer);
         throw reason;
     });
@@ -17250,14 +17339,14 @@ function requestUpdate(composer) {
         return;
     }
     composer.updateRequested = true;
-    composer.taskQueue.queueMicroTask(() => {
+    composer.taskQueue.queueMicroTask(function () {
         composer.updateRequested = false;
         processChanges(composer);
     });
 }
 function needsReInitialization(composer, changes) {
-    let activationStrategy = composer.activationStrategy;
-    const vm = composer.currentViewModel;
+    var activationStrategy = composer.activationStrategy;
+    var vm = composer.currentViewModel;
     if (vm && typeof vm.determineActivationStrategy === 'function') {
         activationStrategy = vm.determineActivationStrategy();
     }
@@ -17266,8 +17355,8 @@ function needsReInitialization(composer, changes) {
         || activationStrategy === ActivationStrategy.Replace;
 }
 
-class IfCore {
-    constructor(viewFactory, viewSlot) {
+var IfCore = (function () {
+    function IfCore(viewFactory, viewSlot) {
         this.viewFactory = viewFactory;
         this.viewSlot = viewSlot;
         this.view = null;
@@ -17276,11 +17365,11 @@ class IfCore {
         this.showing = false;
         this.cache = true;
     }
-    bind(bindingContext, overrideContext) {
+    IfCore.prototype.bind = function (bindingContext, overrideContext) {
         this.bindingContext = bindingContext;
         this.overrideContext = overrideContext;
-    }
-    unbind() {
+    };
+    IfCore.prototype.unbind = function () {
         if (this.view === null) {
             return;
         }
@@ -17296,8 +17385,8 @@ class IfCore {
             this.view.returnToCache();
         }
         this.view = null;
-    }
-    _show() {
+    };
+    IfCore.prototype._show = function () {
         if (this.showing) {
             if (!this.view.isBound) {
                 this.view.bind(this.bindingContext, this.overrideContext);
@@ -17312,51 +17401,56 @@ class IfCore {
         }
         this.showing = true;
         return this.viewSlot.add(this.view);
-    }
-    _hide() {
+    };
+    IfCore.prototype._hide = function () {
+        var _this = this;
         if (!this.showing) {
             return;
         }
         this.showing = false;
-        let removed = this.viewSlot.remove(this.view);
+        var removed = this.viewSlot.remove(this.view);
         if (removed instanceof Promise) {
-            return removed.then(() => {
-                this._unbindView();
+            return removed.then(function () {
+                _this._unbindView();
             });
         }
         this._unbindView();
-    }
-    _unbindView() {
-        const cache = this.cache === 'false' ? false : !!this.cache;
+    };
+    IfCore.prototype._unbindView = function () {
+        var cache = this.cache === 'false' ? false : !!this.cache;
         this.view.unbind();
         if (!cache) {
             this.view = null;
         }
-    }
-}
+    };
+    return IfCore;
+}());
 
-let If = class If extends IfCore {
-    constructor() {
-        super(...arguments);
-        this.cache = true;
+var If = (function (_super) {
+    __extends(If, _super);
+    function If() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.cache = true;
+        return _this;
     }
-    bind(bindingContext, overrideContext) {
-        super.bind(bindingContext, overrideContext);
+    If.prototype.bind = function (bindingContext, overrideContext) {
+        _super.prototype.bind.call(this, bindingContext, overrideContext);
         if (this.condition) {
             this._show();
         }
         else {
             this._hide();
         }
-    }
-    conditionChanged(newValue) {
+    };
+    If.prototype.conditionChanged = function (newValue) {
         this._update(newValue);
-    }
-    _update(show) {
+    };
+    If.prototype._update = function (show) {
+        var _this = this;
         if (this.animating) {
             return;
         }
-        let promise;
+        var promise;
         if (this.elseVm) {
             promise = show ? this._swap(this.elseVm, this) : this._swap(this, this.elseVm);
         }
@@ -17365,57 +17459,60 @@ let If = class If extends IfCore {
         }
         if (promise) {
             this.animating = true;
-            promise.then(() => {
-                this.animating = false;
-                if (this.condition !== this.showing) {
-                    this._update(this.condition);
+            promise.then(function () {
+                _this.animating = false;
+                if (_this.condition !== _this.showing) {
+                    _this._update(_this.condition);
                 }
             });
         }
-    }
-    _swap(remove, add) {
+    };
+    If.prototype._swap = function (remove, add) {
         switch (this.swapOrder) {
             case 'before':
-                return Promise.resolve(add._show()).then(() => remove._hide());
+                return Promise.resolve(add._show()).then(function () { return remove._hide(); });
             case 'with':
                 return Promise.all([remove._hide(), add._show()]);
             default:
-                let promise = remove._hide();
-                return promise ? promise.then(() => add._show()) : add._show();
+                var promise = remove._hide();
+                return promise ? promise.then(function () { return add._show(); }) : add._show();
         }
-    }
-};
-__decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"])({ primaryProperty: true })
-], If.prototype, "condition", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], If.prototype, "swapOrder", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], If.prototype, "cache", void 0);
-If = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('if'),
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
-], If);
+    };
+    __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"])({ primaryProperty: true })
+    ], If.prototype, "condition", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], If.prototype, "swapOrder", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], If.prototype, "cache", void 0);
+    If = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('if'),
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
+    ], If);
+    return If;
+}(IfCore));
 
-let Else = class Else extends IfCore {
-    constructor(viewFactory, viewSlot) {
-        super(viewFactory, viewSlot);
-        this._registerInIf();
+var Else = (function (_super) {
+    __extends(Else, _super);
+    function Else(viewFactory, viewSlot) {
+        var _this = _super.call(this, viewFactory, viewSlot) || this;
+        _this._registerInIf();
+        return _this;
     }
-    bind(bindingContext, overrideContext) {
-        super.bind(bindingContext, overrideContext);
+    Else.prototype.bind = function (bindingContext, overrideContext) {
+        _super.prototype.bind.call(this, bindingContext, overrideContext);
         if (this.ifVm.condition) {
             this._hide();
         }
         else {
             this._show();
         }
-    }
-    _registerInIf() {
-        let previous = this.viewSlot.anchor.previousSibling;
+    };
+    Else.prototype._registerInIf = function () {
+        var previous = this.viewSlot.anchor.previousSibling;
         while (previous && !previous.au) {
             previous = previous.previousSibling;
         }
@@ -17424,28 +17521,29 @@ let Else = class Else extends IfCore {
         }
         this.ifVm = previous.au.if.viewModel;
         this.ifVm.elseVm = this;
-    }
-};
-Else = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('else'),
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
-], Else);
+    };
+    Else = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('else'),
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
+    ], Else);
+    return Else;
+}(IfCore));
 
-let With = class With {
-    constructor(viewFactory, viewSlot) {
+var With = (function () {
+    function With(viewFactory, viewSlot) {
         this.viewFactory = viewFactory;
         this.viewSlot = viewSlot;
         this.parentOverrideContext = null;
         this.view = null;
     }
-    bind(bindingContext, overrideContext) {
+    With.prototype.bind = function (bindingContext, overrideContext) {
         this.parentOverrideContext = overrideContext;
         this.valueChanged(this.value);
-    }
-    valueChanged(newValue) {
-        let overrideContext = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["createOverrideContext"])(newValue, this.parentOverrideContext);
-        let view = this.view;
+    };
+    With.prototype.valueChanged = function (newValue) {
+        var overrideContext = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["createOverrideContext"])(newValue, this.parentOverrideContext);
+        var view = this.view;
         if (!view) {
             view = this.view = this.viewFactory.create();
             view.bind(newValue, overrideContext);
@@ -17454,24 +17552,25 @@ let With = class With {
         else {
             view.bind(newValue, overrideContext);
         }
-    }
-    unbind() {
-        let view = this.view;
+    };
+    With.prototype.unbind = function () {
+        var view = this.view;
         this.parentOverrideContext = null;
         if (view) {
             view.unbind();
         }
-    }
-};
-With = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('with'),
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
-], With);
+    };
+    With = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('with'),
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
+    ], With);
+    return With;
+}());
 
-const oneTime = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].oneTime;
+var oneTime = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].oneTime;
 function updateOverrideContexts(views, startIndex) {
-    let length = views.length;
+    var length = views.length;
     if (startIndex > 0) {
         startIndex = startIndex - 1;
     }
@@ -17480,8 +17579,8 @@ function updateOverrideContexts(views, startIndex) {
     }
 }
 function createFullOverrideContext(repeat, data, index, length, key) {
-    let bindingContext = {};
-    let overrideContext = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["createOverrideContext"])(bindingContext, repeat.scope.overrideContext);
+    var bindingContext = {};
+    var overrideContext = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["createOverrideContext"])(bindingContext, repeat.scope.overrideContext);
     if (typeof key !== 'undefined') {
         bindingContext[repeat.key] = key;
         bindingContext[repeat.value] = data;
@@ -17493,9 +17592,9 @@ function createFullOverrideContext(repeat, data, index, length, key) {
     return overrideContext;
 }
 function updateOverrideContext(overrideContext, index, length) {
-    let first = (index === 0);
-    let last = (index === length - 1);
-    let even = index % 2 === 0;
+    var first = (index === 0);
+    var last = (index === length - 1);
+    var even = index % 2 === 0;
     overrideContext.$index = index;
     overrideContext.$first = first;
     overrideContext.$last = last;
@@ -17505,13 +17604,13 @@ function updateOverrideContext(overrideContext, index, length) {
 }
 function getItemsSourceExpression(instruction, attrName) {
     return instruction.behaviorInstructions
-        .filter(bi => bi.originalAttrName === attrName)[0]
+        .filter(function (bi) { return bi.originalAttrName === attrName; })[0]
         .attributes
         .items
         .sourceExpression;
 }
 function unwrapExpression(expression) {
-    let unwrapped = false;
+    var unwrapped = false;
     while (expression instanceof __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["BindingBehavior"]) {
         expression = expression.expression;
     }
@@ -17542,8 +17641,8 @@ function indexOf(array, item, matcher, startIndex) {
     if (!matcher) {
         return array.indexOf(item);
     }
-    const length = array.length;
-    for (let index = startIndex || 0; index < length; index++) {
+    var length = array.length;
+    for (var index = startIndex || 0; index < length; index++) {
         if (matcher(array[index], item)) {
             return index;
         }
@@ -17551,73 +17650,76 @@ function indexOf(array, item, matcher, startIndex) {
     return -1;
 }
 
-class ArrayRepeatStrategy {
-    getCollectionObserver(observerLocator, items) {
-        return observerLocator.getArrayObserver(items);
+var ArrayRepeatStrategy = (function () {
+    function ArrayRepeatStrategy() {
     }
-    instanceChanged(repeat, items) {
-        const $repeat = repeat;
-        const itemsLength = items.length;
+    ArrayRepeatStrategy.prototype.getCollectionObserver = function (observerLocator, items) {
+        return observerLocator.getArrayObserver(items);
+    };
+    ArrayRepeatStrategy.prototype.instanceChanged = function (repeat, items) {
+        var _this = this;
+        var $repeat = repeat;
+        var itemsLength = items.length;
         if (!items || itemsLength === 0) {
             $repeat.removeAllViews(true, !$repeat.viewsRequireLifecycle);
             return;
         }
-        const children = $repeat.views();
-        const viewsLength = children.length;
+        var children = $repeat.views();
+        var viewsLength = children.length;
         if (viewsLength === 0) {
             this._standardProcessInstanceChanged($repeat, items);
             return;
         }
         if ($repeat.viewsRequireLifecycle) {
-            const childrenSnapshot = children.slice(0);
-            const itemNameInBindingContext = $repeat.local;
-            const matcher = $repeat.matcher();
-            let itemsPreviouslyInViews = [];
-            const viewsToRemove = [];
-            for (let index = 0; index < viewsLength; index++) {
-                const view = childrenSnapshot[index];
-                const oldItem = view.bindingContext[itemNameInBindingContext];
-                if (indexOf(items, oldItem, matcher) === -1) {
+            var childrenSnapshot = children.slice(0);
+            var itemNameInBindingContext = $repeat.local;
+            var matcher_1 = $repeat.matcher();
+            var itemsPreviouslyInViews_1 = [];
+            var viewsToRemove = [];
+            for (var index = 0; index < viewsLength; index++) {
+                var view = childrenSnapshot[index];
+                var oldItem = view.bindingContext[itemNameInBindingContext];
+                if (indexOf(items, oldItem, matcher_1) === -1) {
                     viewsToRemove.push(view);
                 }
                 else {
-                    itemsPreviouslyInViews.push(oldItem);
+                    itemsPreviouslyInViews_1.push(oldItem);
                 }
             }
-            let updateViews;
-            let removePromise;
-            if (itemsPreviouslyInViews.length > 0) {
+            var updateViews = void 0;
+            var removePromise = void 0;
+            if (itemsPreviouslyInViews_1.length > 0) {
                 removePromise = $repeat.removeViews(viewsToRemove, true, !$repeat.viewsRequireLifecycle);
-                updateViews = () => {
-                    for (let index = 0; index < itemsLength; index++) {
-                        const item = items[index];
-                        const indexOfView = indexOf(itemsPreviouslyInViews, item, matcher, index);
-                        let view;
+                updateViews = function () {
+                    for (var index = 0; index < itemsLength; index++) {
+                        var item = items[index];
+                        var indexOfView = indexOf(itemsPreviouslyInViews_1, item, matcher_1, index);
+                        var view = void 0;
                         if (indexOfView === -1) {
-                            const overrideContext = createFullOverrideContext($repeat, items[index], index, itemsLength);
+                            var overrideContext = createFullOverrideContext($repeat, items[index], index, itemsLength);
                             $repeat.insertView(index, overrideContext.bindingContext, overrideContext);
-                            itemsPreviouslyInViews.splice(index, 0, undefined);
+                            itemsPreviouslyInViews_1.splice(index, 0, undefined);
                         }
                         else if (indexOfView === index) {
                             view = children[indexOfView];
-                            itemsPreviouslyInViews[indexOfView] = undefined;
+                            itemsPreviouslyInViews_1[indexOfView] = undefined;
                         }
                         else {
                             view = children[indexOfView];
                             $repeat.moveView(indexOfView, index);
-                            itemsPreviouslyInViews.splice(indexOfView, 1);
-                            itemsPreviouslyInViews.splice(index, 0, undefined);
+                            itemsPreviouslyInViews_1.splice(indexOfView, 1);
+                            itemsPreviouslyInViews_1.splice(index, 0, undefined);
                         }
                         if (view) {
                             updateOverrideContext(view.overrideContext, index, itemsLength);
                         }
                     }
-                    this._inPlaceProcessItems($repeat, items);
+                    _this._inPlaceProcessItems($repeat, items);
                 };
             }
             else {
                 removePromise = $repeat.removeAllViews(true, !$repeat.viewsRequireLifecycle);
-                updateViews = () => this._standardProcessInstanceChanged($repeat, items);
+                updateViews = function () { return _this._standardProcessInstanceChanged($repeat, items); };
             }
             if (removePromise instanceof Promise) {
                 removePromise.then(updateViews);
@@ -17629,27 +17731,27 @@ class ArrayRepeatStrategy {
         else {
             this._inPlaceProcessItems($repeat, items);
         }
-    }
-    _standardProcessInstanceChanged(repeat, items) {
-        for (let i = 0, ii = items.length; i < ii; i++) {
-            let overrideContext = createFullOverrideContext(repeat, items[i], i, ii);
+    };
+    ArrayRepeatStrategy.prototype._standardProcessInstanceChanged = function (repeat, items) {
+        for (var i = 0, ii = items.length; i < ii; i++) {
+            var overrideContext = createFullOverrideContext(repeat, items[i], i, ii);
             repeat.addView(overrideContext.bindingContext, overrideContext);
         }
-    }
-    _inPlaceProcessItems(repeat, items) {
-        let itemsLength = items.length;
-        let viewsLength = repeat.viewCount();
+    };
+    ArrayRepeatStrategy.prototype._inPlaceProcessItems = function (repeat, items) {
+        var itemsLength = items.length;
+        var viewsLength = repeat.viewCount();
         while (viewsLength > itemsLength) {
             viewsLength--;
             repeat.removeView(viewsLength, true, !repeat.viewsRequireLifecycle);
         }
-        let local = repeat.local;
-        for (let i = 0; i < viewsLength; i++) {
-            let view = repeat.view(i);
-            let last = i === itemsLength - 1;
-            let middle = i !== 0 && !last;
-            let bindingContext = view.bindingContext;
-            let overrideContext = view.overrideContext;
+        var local = repeat.local;
+        for (var i = 0; i < viewsLength; i++) {
+            var view = repeat.view(i);
+            var last = i === itemsLength - 1;
+            var middle = i !== 0 && !last;
+            var bindingContext = view.bindingContext;
+            var overrideContext = view.overrideContext;
             if (bindingContext[local] === items[i]
                 && overrideContext.$middle === middle
                 && overrideContext.$last === last) {
@@ -17660,44 +17762,46 @@ class ArrayRepeatStrategy {
             overrideContext.$last = last;
             repeat.updateBindings(view);
         }
-        for (let i = viewsLength; i < itemsLength; i++) {
-            let overrideContext = createFullOverrideContext(repeat, items[i], i, itemsLength);
+        for (var i = viewsLength; i < itemsLength; i++) {
+            var overrideContext = createFullOverrideContext(repeat, items[i], i, itemsLength);
             repeat.addView(overrideContext.bindingContext, overrideContext);
         }
-    }
-    instanceMutated(repeat, array, splices) {
+    };
+    ArrayRepeatStrategy.prototype.instanceMutated = function (repeat, array, splices) {
+        var _this = this;
         if (repeat.__queuedSplices) {
-            for (let i = 0, ii = splices.length; i < ii; ++i) {
-                let { index, removed, addedCount } = splices[i];
+            for (var i = 0, ii = splices.length; i < ii; ++i) {
+                var _a = splices[i], index = _a.index, removed = _a.removed, addedCount = _a.addedCount;
                 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["mergeSplice"])(repeat.__queuedSplices, index, removed, addedCount);
             }
             repeat.__array = array.slice(0);
             return;
         }
-        let maybePromise = this._runSplices(repeat, array.slice(0), splices);
+        var maybePromise = this._runSplices(repeat, array.slice(0), splices);
         if (maybePromise instanceof Promise) {
-            let queuedSplices = repeat.__queuedSplices = [];
-            let runQueuedSplices = () => {
-                if (!queuedSplices.length) {
+            var queuedSplices_1 = repeat.__queuedSplices = [];
+            var runQueuedSplices_1 = function () {
+                if (!queuedSplices_1.length) {
                     repeat.__queuedSplices = undefined;
                     repeat.__array = undefined;
                     return;
                 }
-                let nextPromise = this._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
-                queuedSplices = repeat.__queuedSplices = [];
-                nextPromise.then(runQueuedSplices);
+                var nextPromise = _this._runSplices(repeat, repeat.__array, queuedSplices_1) || Promise.resolve();
+                queuedSplices_1 = repeat.__queuedSplices = [];
+                nextPromise.then(runQueuedSplices_1);
             };
-            maybePromise.then(runQueuedSplices);
+            maybePromise.then(runQueuedSplices_1);
         }
-    }
-    _runSplices(repeat, array, splices) {
-        let removeDelta = 0;
-        let rmPromises = [];
-        for (let i = 0, ii = splices.length; i < ii; ++i) {
-            let splice = splices[i];
-            let removed = splice.removed;
-            for (let j = 0, jj = removed.length; j < jj; ++j) {
-                let viewOrPromise = repeat.removeView(splice.index + removeDelta + rmPromises.length, true);
+    };
+    ArrayRepeatStrategy.prototype._runSplices = function (repeat, array, splices) {
+        var _this = this;
+        var removeDelta = 0;
+        var rmPromises = [];
+        for (var i = 0, ii = splices.length; i < ii; ++i) {
+            var splice = splices[i];
+            var removed = splice.removed;
+            for (var j = 0, jj = removed.length; j < jj; ++j) {
+                var viewOrPromise = repeat.removeView(splice.index + removeDelta + rmPromises.length, true);
                 if (viewOrPromise instanceof Promise) {
                     rmPromises.push(viewOrPromise);
                 }
@@ -17705,66 +17809,70 @@ class ArrayRepeatStrategy {
             removeDelta -= splice.addedCount;
         }
         if (rmPromises.length > 0) {
-            return Promise.all(rmPromises).then(() => {
-                let spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
+            return Promise.all(rmPromises).then(function () {
+                var spliceIndexLow = _this._handleAddedSplices(repeat, array, splices);
                 updateOverrideContexts(repeat.views(), spliceIndexLow);
             });
         }
-        let spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
+        var spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
         updateOverrideContexts(repeat.views(), spliceIndexLow);
         return undefined;
-    }
-    _handleAddedSplices(repeat, array, splices) {
-        let spliceIndex;
-        let spliceIndexLow;
-        let arrayLength = array.length;
-        for (let i = 0, ii = splices.length; i < ii; ++i) {
-            let splice = splices[i];
-            let addIndex = spliceIndex = splice.index;
-            let end = splice.index + splice.addedCount;
+    };
+    ArrayRepeatStrategy.prototype._handleAddedSplices = function (repeat, array, splices) {
+        var spliceIndex;
+        var spliceIndexLow;
+        var arrayLength = array.length;
+        for (var i = 0, ii = splices.length; i < ii; ++i) {
+            var splice = splices[i];
+            var addIndex = spliceIndex = splice.index;
+            var end = splice.index + splice.addedCount;
             if (typeof spliceIndexLow === 'undefined' || spliceIndexLow === null || spliceIndexLow > splice.index) {
                 spliceIndexLow = spliceIndex;
             }
             for (; addIndex < end; ++addIndex) {
-                let overrideContext = createFullOverrideContext(repeat, array[addIndex], addIndex, arrayLength);
+                var overrideContext = createFullOverrideContext(repeat, array[addIndex], addIndex, arrayLength);
                 repeat.insertView(addIndex, overrideContext.bindingContext, overrideContext);
             }
         }
         return spliceIndexLow;
-    }
-}
+    };
+    return ArrayRepeatStrategy;
+}());
 
-class MapRepeatStrategy {
-    getCollectionObserver(observerLocator, items) {
-        return observerLocator.getMapObserver(items);
+var MapRepeatStrategy = (function () {
+    function MapRepeatStrategy() {
     }
-    instanceChanged(repeat, items) {
-        let removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+    MapRepeatStrategy.prototype.getCollectionObserver = function (observerLocator, items) {
+        return observerLocator.getMapObserver(items);
+    };
+    MapRepeatStrategy.prototype.instanceChanged = function (repeat, items) {
+        var _this = this;
+        var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
         if (removePromise instanceof Promise) {
-            removePromise.then(() => this._standardProcessItems(repeat, items));
+            removePromise.then(function () { return _this._standardProcessItems(repeat, items); });
             return;
         }
         this._standardProcessItems(repeat, items);
-    }
-    _standardProcessItems(repeat, items) {
-        let index = 0;
-        let overrideContext;
-        items.forEach((value, key) => {
+    };
+    MapRepeatStrategy.prototype._standardProcessItems = function (repeat, items) {
+        var index = 0;
+        var overrideContext;
+        items.forEach(function (value, key) {
             overrideContext = createFullOverrideContext(repeat, value, index, items.size, key);
             repeat.addView(overrideContext.bindingContext, overrideContext);
             ++index;
         });
-    }
-    instanceMutated(repeat, map, records) {
-        let key;
-        let i;
-        let ii;
-        let overrideContext;
-        let removeIndex;
-        let addIndex;
-        let record;
-        let rmPromises = [];
-        let viewOrPromise;
+    };
+    MapRepeatStrategy.prototype.instanceMutated = function (repeat, map, records) {
+        var key;
+        var i;
+        var ii;
+        var overrideContext;
+        var removeIndex;
+        var addIndex;
+        var record;
+        var rmPromises = [];
+        var viewOrPromise;
         for (i = 0, ii = records.length; i < ii; ++i) {
             record = records[i];
             key = record.key;
@@ -17801,18 +17909,18 @@ class MapRepeatStrategy {
             }
         }
         if (rmPromises.length > 0) {
-            Promise.all(rmPromises).then(() => {
+            Promise.all(rmPromises).then(function () {
                 updateOverrideContexts(repeat.views(), 0);
             });
         }
         else {
             updateOverrideContexts(repeat.views(), 0);
         }
-    }
-    _getViewIndexByKey(repeat, key) {
-        let i;
-        let ii;
-        let child;
+    };
+    MapRepeatStrategy.prototype._getViewIndexByKey = function (repeat, key) {
+        var i;
+        var ii;
+        var child;
         for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
             child = repeat.view(i);
             if (child.bindingContext[repeat.key] === key) {
@@ -17820,35 +17928,42 @@ class MapRepeatStrategy {
             }
         }
         return undefined;
-    }
-}
+    };
+    return MapRepeatStrategy;
+}());
 
-class NullRepeatStrategy {
-    instanceChanged(repeat, items) {
+var NullRepeatStrategy = (function () {
+    function NullRepeatStrategy() {
+    }
+    NullRepeatStrategy.prototype.instanceChanged = function (repeat, items) {
         repeat.removeAllViews(true);
-    }
-    getCollectionObserver(observerLocator, items) {
-    }
-}
+    };
+    NullRepeatStrategy.prototype.getCollectionObserver = function (observerLocator, items) {
+    };
+    return NullRepeatStrategy;
+}());
 
-class NumberRepeatStrategy {
-    getCollectionObserver() {
-        return null;
+var NumberRepeatStrategy = (function () {
+    function NumberRepeatStrategy() {
     }
-    instanceChanged(repeat, value) {
-        let removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+    NumberRepeatStrategy.prototype.getCollectionObserver = function () {
+        return null;
+    };
+    NumberRepeatStrategy.prototype.instanceChanged = function (repeat, value) {
+        var _this = this;
+        var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
         if (removePromise instanceof Promise) {
-            removePromise.then(() => this._standardProcessItems(repeat, value));
+            removePromise.then(function () { return _this._standardProcessItems(repeat, value); });
             return;
         }
         this._standardProcessItems(repeat, value);
-    }
-    _standardProcessItems(repeat, value) {
-        let childrenLength = repeat.viewCount();
-        let i;
-        let ii;
-        let overrideContext;
-        let viewsToRemove;
+    };
+    NumberRepeatStrategy.prototype._standardProcessItems = function (repeat, value) {
+        var childrenLength = repeat.viewCount();
+        var i;
+        var ii;
+        var overrideContext;
+        var viewsToRemove;
         value = Math.floor(value);
         viewsToRemove = childrenLength - value;
         if (viewsToRemove > 0) {
@@ -17865,45 +17980,49 @@ class NumberRepeatStrategy {
             repeat.addView(overrideContext.bindingContext, overrideContext);
         }
         updateOverrideContexts(repeat.views(), 0);
-    }
-}
+    };
+    return NumberRepeatStrategy;
+}());
 
-class SetRepeatStrategy {
-    getCollectionObserver(observerLocator, items) {
-        return observerLocator.getSetObserver(items);
+var SetRepeatStrategy = (function () {
+    function SetRepeatStrategy() {
     }
-    instanceChanged(repeat, items) {
-        let removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+    SetRepeatStrategy.prototype.getCollectionObserver = function (observerLocator, items) {
+        return observerLocator.getSetObserver(items);
+    };
+    SetRepeatStrategy.prototype.instanceChanged = function (repeat, items) {
+        var _this = this;
+        var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
         if (removePromise instanceof Promise) {
-            removePromise.then(() => this._standardProcessItems(repeat, items));
+            removePromise.then(function () { return _this._standardProcessItems(repeat, items); });
             return;
         }
         this._standardProcessItems(repeat, items);
-    }
-    _standardProcessItems(repeat, items) {
-        let index = 0;
-        let overrideContext;
-        items.forEach(value => {
+    };
+    SetRepeatStrategy.prototype._standardProcessItems = function (repeat, items) {
+        var index = 0;
+        var overrideContext;
+        items.forEach(function (value) {
             overrideContext = createFullOverrideContext(repeat, value, index, items.size);
             repeat.addView(overrideContext.bindingContext, overrideContext);
             ++index;
         });
-    }
-    instanceMutated(repeat, set, records) {
-        let value;
-        let i;
-        let ii;
-        let overrideContext;
-        let removeIndex;
-        let record;
-        let rmPromises = [];
-        let viewOrPromise;
+    };
+    SetRepeatStrategy.prototype.instanceMutated = function (repeat, set, records) {
+        var value;
+        var i;
+        var ii;
+        var overrideContext;
+        var removeIndex;
+        var record;
+        var rmPromises = [];
+        var viewOrPromise;
         for (i = 0, ii = records.length; i < ii; ++i) {
             record = records[i];
             value = record.value;
             switch (record.type) {
                 case 'add':
-                    let size = Math.max(set.size - 1, 0);
+                    var size = Math.max(set.size - 1, 0);
                     overrideContext = createFullOverrideContext(repeat, value, size, set.size);
                     repeat.insertView(size, overrideContext.bindingContext, overrideContext);
                     break;
@@ -17922,18 +18041,18 @@ class SetRepeatStrategy {
             }
         }
         if (rmPromises.length > 0) {
-            Promise.all(rmPromises).then(() => {
+            Promise.all(rmPromises).then(function () {
                 updateOverrideContexts(repeat.views(), 0);
             });
         }
         else {
             updateOverrideContexts(repeat.views(), 0);
         }
-    }
-    _getViewIndexByValue(repeat, value) {
-        let i;
-        let ii;
-        let child;
+    };
+    SetRepeatStrategy.prototype._getViewIndexByValue = function (repeat, value) {
+        var i;
+        var ii;
+        var child;
         for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
             child = repeat.view(i);
             if (child.bindingContext[repeat.local] === value) {
@@ -17941,46 +18060,48 @@ class SetRepeatStrategy {
             }
         }
         return undefined;
-    }
-}
+    };
+    return SetRepeatStrategy;
+}());
 
-class RepeatStrategyLocator {
-    constructor() {
+var RepeatStrategyLocator = (function () {
+    function RepeatStrategyLocator() {
         this.matchers = [];
         this.strategies = [];
-        this.addStrategy(items => items === null || items === undefined, new NullRepeatStrategy());
-        this.addStrategy(items => items instanceof Array, new ArrayRepeatStrategy());
-        this.addStrategy(items => items instanceof Map, new MapRepeatStrategy());
-        this.addStrategy(items => items instanceof Set, new SetRepeatStrategy());
-        this.addStrategy(items => typeof items === 'number', new NumberRepeatStrategy());
+        this.addStrategy(function (items) { return items === null || items === undefined; }, new NullRepeatStrategy());
+        this.addStrategy(function (items) { return items instanceof Array; }, new ArrayRepeatStrategy());
+        this.addStrategy(function (items) { return items instanceof Map; }, new MapRepeatStrategy());
+        this.addStrategy(function (items) { return items instanceof Set; }, new SetRepeatStrategy());
+        this.addStrategy(function (items) { return typeof items === 'number'; }, new NumberRepeatStrategy());
     }
-    addStrategy(matcher, strategy) {
+    RepeatStrategyLocator.prototype.addStrategy = function (matcher, strategy) {
         this.matchers.push(matcher);
         this.strategies.push(strategy);
-    }
-    getStrategy(items) {
-        let matchers = this.matchers;
-        for (let i = 0, ii = matchers.length; i < ii; ++i) {
+    };
+    RepeatStrategyLocator.prototype.getStrategy = function (items) {
+        var matchers = this.matchers;
+        for (var i = 0, ii = matchers.length; i < ii; ++i) {
             if (matchers[i](items)) {
                 return this.strategies[i];
             }
         }
         return null;
-    }
-}
+    };
+    return RepeatStrategyLocator;
+}());
 
-const lifecycleOptionalBehaviors = ['focus', 'if', 'else', 'repeat', 'show', 'hide', 'with'];
+var lifecycleOptionalBehaviors = ['focus', 'if', 'else', 'repeat', 'show', 'hide', 'with'];
 function behaviorRequiresLifecycle(instruction) {
-    let t = instruction.type;
-    let name = t.elementName !== null ? t.elementName : t.attributeName;
+    var t = instruction.type;
+    var name = t.elementName !== null ? t.elementName : t.attributeName;
     return lifecycleOptionalBehaviors.indexOf(name) === -1 && (t.handlesAttached || t.handlesBind || t.handlesCreated || t.handlesDetached || t.handlesUnbind)
         || t.viewFactory && viewsRequireLifecycle(t.viewFactory)
         || instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
 }
 function targetRequiresLifecycle(instruction) {
-    let behaviors = instruction.behaviorInstructions;
+    var behaviors = instruction.behaviorInstructions;
     if (behaviors) {
-        let i = behaviors.length;
+        var i = behaviors.length;
         while (i--) {
             if (behaviorRequiresLifecycle(behaviors[i])) {
                 return true;
@@ -18002,7 +18123,7 @@ function viewsRequireLifecycle(viewFactory) {
         viewFactory._viewsRequireLifecycle = true;
         return true;
     }
-    for (let id in viewFactory.instructions) {
+    for (var id in viewFactory.instructions) {
         if (targetRequiresLifecycle(viewFactory.instructions[id])) {
             viewFactory._viewsRequireLifecycle = true;
             return true;
@@ -18012,117 +18133,126 @@ function viewsRequireLifecycle(viewFactory) {
     return false;
 }
 
-class AbstractRepeater {
-    constructor(options) {
+var AbstractRepeater = (function () {
+    function AbstractRepeater(options) {
         Object.assign(this, {
             local: 'items',
             viewsRequireLifecycle: true
         }, options);
     }
-    viewCount() {
+    AbstractRepeater.prototype.viewCount = function () {
         throw new Error('subclass must implement `viewCount`');
-    }
-    views() {
+    };
+    AbstractRepeater.prototype.views = function () {
         throw new Error('subclass must implement `views`');
-    }
-    view(index) {
+    };
+    AbstractRepeater.prototype.view = function (index) {
         throw new Error('subclass must implement `view`');
-    }
-    matcher() {
+    };
+    AbstractRepeater.prototype.matcher = function () {
         throw new Error('subclass must implement `matcher`');
-    }
-    addView(bindingContext, overrideContext) {
+    };
+    AbstractRepeater.prototype.addView = function (bindingContext, overrideContext) {
         throw new Error('subclass must implement `addView`');
-    }
-    insertView(index, bindingContext, overrideContext) {
+    };
+    AbstractRepeater.prototype.insertView = function (index, bindingContext, overrideContext) {
         throw new Error('subclass must implement `insertView`');
-    }
-    moveView(sourceIndex, targetIndex) {
+    };
+    AbstractRepeater.prototype.moveView = function (sourceIndex, targetIndex) {
         throw new Error('subclass must implement `moveView`');
-    }
-    removeAllViews(returnToCache, skipAnimation) {
+    };
+    AbstractRepeater.prototype.removeAllViews = function (returnToCache, skipAnimation) {
         throw new Error('subclass must implement `removeAllViews`');
-    }
-    removeViews(viewsToRemove, returnToCache, skipAnimation) {
+    };
+    AbstractRepeater.prototype.removeViews = function (viewsToRemove, returnToCache, skipAnimation) {
         throw new Error('subclass must implement `removeView`');
-    }
-    removeView(index, returnToCache, skipAnimation) {
+    };
+    AbstractRepeater.prototype.removeView = function (index, returnToCache, skipAnimation) {
         throw new Error('subclass must implement `removeView`');
-    }
-    updateBindings(view) {
+    };
+    AbstractRepeater.prototype.updateBindings = function (view) {
         throw new Error('subclass must implement `updateBindings`');
-    }
-}
+    };
+    return AbstractRepeater;
+}());
 
-var Repeat_1;
-let Repeat = Repeat_1 = class Repeat extends AbstractRepeater {
-    constructor(viewFactory, instruction, viewSlot, viewResources, observerLocator, strategyLocator) {
-        super({
+var matcherExtractionMarker = '__marker_extracted__';
+var Repeat = (function (_super) {
+    __extends(Repeat, _super);
+    function Repeat(viewFactory, instruction, viewSlot, viewResources, observerLocator, strategyLocator) {
+        var _this = _super.call(this, {
             local: 'item',
             viewsRequireLifecycle: viewsRequireLifecycle(viewFactory)
-        });
-        this.viewFactory = viewFactory;
-        this.instruction = instruction;
-        this.viewSlot = viewSlot;
-        this.lookupFunctions = viewResources.lookupFunctions;
-        this.observerLocator = observerLocator;
-        this.key = 'key';
-        this.value = 'value';
-        this.strategyLocator = strategyLocator;
-        this.ignoreMutation = false;
-        this.sourceExpression = getItemsSourceExpression(this.instruction, 'repeat.for');
-        this.isOneTime = isOneTime(this.sourceExpression);
-        this.viewsRequireLifecycle = viewsRequireLifecycle(viewFactory);
+        }) || this;
+        _this.viewFactory = viewFactory;
+        _this.instruction = instruction;
+        _this.viewSlot = viewSlot;
+        _this.lookupFunctions = viewResources.lookupFunctions;
+        _this.observerLocator = observerLocator;
+        _this.key = 'key';
+        _this.value = 'value';
+        _this.strategyLocator = strategyLocator;
+        _this.ignoreMutation = false;
+        _this.sourceExpression = getItemsSourceExpression(_this.instruction, 'repeat.for');
+        _this.isOneTime = isOneTime(_this.sourceExpression);
+        _this.viewsRequireLifecycle = viewsRequireLifecycle(viewFactory);
+        return _this;
     }
-    call(context, changes) {
+    Repeat_1 = Repeat;
+    Repeat.prototype.call = function (context, changes) {
         this[context](this.items, changes);
-    }
-    bind(bindingContext, overrideContext) {
-        this.scope = { bindingContext, overrideContext };
-        this.matcherBinding = this._captureAndRemoveMatcherBinding();
+    };
+    Repeat.prototype.bind = function (bindingContext, overrideContext) {
+        this.scope = { bindingContext: bindingContext, overrideContext: overrideContext };
+        var instruction = this.instruction;
+        if (!(matcherExtractionMarker in instruction)) {
+            instruction[matcherExtractionMarker] = this._captureAndRemoveMatcherBinding();
+        }
+        this.matcherBinding = instruction[matcherExtractionMarker];
         this.itemsChanged();
-    }
-    unbind() {
+    };
+    Repeat.prototype.unbind = function () {
         this.scope = null;
         this.items = null;
         this.matcherBinding = null;
         this.viewSlot.removeAll(true, true);
         this._unsubscribeCollection();
-    }
-    _unsubscribeCollection() {
+    };
+    Repeat.prototype._unsubscribeCollection = function () {
         if (this.collectionObserver) {
             this.collectionObserver.unsubscribe(this.callContext, this);
             this.collectionObserver = null;
             this.callContext = null;
         }
-    }
-    itemsChanged() {
+    };
+    Repeat.prototype.itemsChanged = function () {
+        var _this = this;
         this._unsubscribeCollection();
         if (!this.scope) {
             return;
         }
-        let items = this.items;
+        var items = this.items;
         this.strategy = this.strategyLocator.getStrategy(items);
         if (!this.strategy) {
-            throw new Error(`Value for '${this.sourceExpression}' is non-repeatable`);
+            throw new Error("Value for '" + this.sourceExpression + "' is non-repeatable");
         }
         if (!this.isOneTime && !this._observeInnerCollection()) {
             this._observeCollection();
         }
         this.ignoreMutation = true;
         this.strategy.instanceChanged(this, items);
-        this.observerLocator.taskQueue.queueMicroTask(() => {
-            this.ignoreMutation = false;
+        this.observerLocator.taskQueue.queueMicroTask(function () {
+            _this.ignoreMutation = false;
         });
-    }
-    _getInnerCollection() {
-        let expression = unwrapExpression(this.sourceExpression);
+    };
+    Repeat.prototype._getInnerCollection = function () {
+        var expression = unwrapExpression(this.sourceExpression);
         if (!expression) {
             return null;
         }
         return expression.evaluate(this.scope, null);
-    }
-    handleCollectionMutated(collection, changes) {
+    };
+    Repeat.prototype.handleCollectionMutated = function (collection, changes) {
         if (!this.collectionObserver) {
             return;
         }
@@ -18130,8 +18260,9 @@ let Repeat = Repeat_1 = class Repeat extends AbstractRepeater {
             return;
         }
         this.strategy.instanceMutated(this, collection, changes);
-    }
-    handleInnerCollectionMutated(collection, changes) {
+    };
+    Repeat.prototype.handleInnerCollectionMutated = function (collection, changes) {
+        var _this = this;
         if (!this.collectionObserver) {
             return;
         }
@@ -18139,18 +18270,18 @@ let Repeat = Repeat_1 = class Repeat extends AbstractRepeater {
             return;
         }
         this.ignoreMutation = true;
-        let newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
-        this.observerLocator.taskQueue.queueMicroTask(() => this.ignoreMutation = false);
+        var newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
+        this.observerLocator.taskQueue.queueMicroTask(function () { return _this.ignoreMutation = false; });
         if (newItems === this.items) {
             this.itemsChanged();
         }
         else {
             this.items = newItems;
         }
-    }
-    _observeInnerCollection() {
-        let items = this._getInnerCollection();
-        let strategy = this.strategyLocator.getStrategy(items);
+    };
+    Repeat.prototype._observeInnerCollection = function () {
+        var items = this._getInnerCollection();
+        var strategy = this.strategyLocator.getStrategy(items);
         if (!strategy) {
             return false;
         }
@@ -18161,112 +18292,114 @@ let Repeat = Repeat_1 = class Repeat extends AbstractRepeater {
         this.callContext = 'handleInnerCollectionMutated';
         this.collectionObserver.subscribe(this.callContext, this);
         return true;
-    }
-    _observeCollection() {
-        let items = this.items;
+    };
+    Repeat.prototype._observeCollection = function () {
+        var items = this.items;
         this.collectionObserver = this.strategy.getCollectionObserver(this.observerLocator, items);
         if (this.collectionObserver) {
             this.callContext = 'handleCollectionMutated';
             this.collectionObserver.subscribe(this.callContext, this);
         }
-    }
-    _captureAndRemoveMatcherBinding() {
-        const viewFactory = this.viewFactory.viewFactory;
+    };
+    Repeat.prototype._captureAndRemoveMatcherBinding = function () {
+        var viewFactory = this.viewFactory.viewFactory;
         if (viewFactory) {
-            const template = viewFactory.template;
-            const instructions = viewFactory.instructions;
+            var template = viewFactory.template;
+            var instructions = viewFactory.instructions;
             if (Repeat_1.useInnerMatcher) {
                 return extractMatcherBindingExpression(instructions);
             }
-            if (template.children.length > 1) {
+            if (getChildrenCount(template) > 1) {
                 return undefined;
             }
-            const repeatedElement = template.firstElementChild;
+            var repeatedElement = getFirstElementChild(template);
             if (!repeatedElement.hasAttribute('au-target-id')) {
                 return undefined;
             }
-            const repeatedElementTargetId = repeatedElement.getAttribute('au-target-id');
+            var repeatedElementTargetId = repeatedElement.getAttribute('au-target-id');
             return extractMatcherBindingExpression(instructions, repeatedElementTargetId);
         }
         return undefined;
-    }
-    viewCount() { return this.viewSlot.children.length; }
-    views() { return this.viewSlot.children; }
-    view(index) { return this.viewSlot.children[index]; }
-    matcher() {
-        const matcherBinding = this.matcherBinding;
+    };
+    Repeat.prototype.viewCount = function () { return this.viewSlot.children.length; };
+    Repeat.prototype.views = function () { return this.viewSlot.children; };
+    Repeat.prototype.view = function (index) { return this.viewSlot.children[index]; };
+    Repeat.prototype.matcher = function () {
+        var matcherBinding = this.matcherBinding;
         return matcherBinding
             ? matcherBinding.sourceExpression.evaluate(this.scope, matcherBinding.lookupFunctions)
             : null;
-    }
-    addView(bindingContext, overrideContext) {
-        let view = this.viewFactory.create();
+    };
+    Repeat.prototype.addView = function (bindingContext, overrideContext) {
+        var view = this.viewFactory.create();
         view.bind(bindingContext, overrideContext);
         this.viewSlot.add(view);
-    }
-    insertView(index, bindingContext, overrideContext) {
-        let view = this.viewFactory.create();
+    };
+    Repeat.prototype.insertView = function (index, bindingContext, overrideContext) {
+        var view = this.viewFactory.create();
         view.bind(bindingContext, overrideContext);
         this.viewSlot.insert(index, view);
-    }
-    moveView(sourceIndex, targetIndex) {
+    };
+    Repeat.prototype.moveView = function (sourceIndex, targetIndex) {
         this.viewSlot.move(sourceIndex, targetIndex);
-    }
-    removeAllViews(returnToCache, skipAnimation) {
+    };
+    Repeat.prototype.removeAllViews = function (returnToCache, skipAnimation) {
         return this.viewSlot.removeAll(returnToCache, skipAnimation);
-    }
-    removeViews(viewsToRemove, returnToCache, skipAnimation) {
+    };
+    Repeat.prototype.removeViews = function (viewsToRemove, returnToCache, skipAnimation) {
         return this.viewSlot.removeMany(viewsToRemove, returnToCache, skipAnimation);
-    }
-    removeView(index, returnToCache, skipAnimation) {
+    };
+    Repeat.prototype.removeView = function (index, returnToCache, skipAnimation) {
         return this.viewSlot.removeAt(index, returnToCache, skipAnimation);
-    }
-    updateBindings(view) {
-        const $view = view;
-        let j = $view.bindings.length;
+    };
+    Repeat.prototype.updateBindings = function (view) {
+        var $view = view;
+        var j = $view.bindings.length;
         while (j--) {
             updateOneTimeBinding($view.bindings[j]);
         }
         j = $view.controllers.length;
         while (j--) {
-            let k = $view.controllers[j].boundProperties.length;
+            var k = $view.controllers[j].boundProperties.length;
             while (k--) {
-                let binding = $view.controllers[j].boundProperties[k].binding;
+                var binding = $view.controllers[j].boundProperties[k].binding;
                 updateOneTimeBinding(binding);
             }
         }
-    }
-};
-Repeat.useInnerMatcher = true;
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Repeat.prototype, "items", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Repeat.prototype, "local", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Repeat.prototype, "key", void 0);
-__decorate([
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
-], Repeat.prototype, "value", void 0);
-Repeat = Repeat_1 = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('repeat'),
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["TargetInstruction"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewResources"], __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["ObserverLocator"], RepeatStrategyLocator)
-], Repeat);
-const extractMatcherBindingExpression = (instructions, targetedElementId) => {
-    const instructionIds = Object.keys(instructions);
-    for (let i = 0; i < instructionIds.length; i++) {
-        const instructionId = instructionIds[i];
+    };
+    var Repeat_1;
+    Repeat.useInnerMatcher = true;
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Repeat.prototype, "items", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Repeat.prototype, "local", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Repeat.prototype, "key", void 0);
+    __decorate([
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"]
+    ], Repeat.prototype, "value", void 0);
+    Repeat = Repeat_1 = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('repeat'),
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["TargetInstruction"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewResources"], __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["ObserverLocator"], RepeatStrategyLocator)
+    ], Repeat);
+    return Repeat;
+}(AbstractRepeater));
+var extractMatcherBindingExpression = function (instructions, targetedElementId) {
+    var instructionIds = Object.keys(instructions);
+    for (var i = 0; i < instructionIds.length; i++) {
+        var instructionId = instructionIds[i];
         if (targetedElementId !== undefined && instructionId !== targetedElementId) {
             continue;
         }
-        const expressions = instructions[instructionId].expressions;
+        var expressions = instructions[instructionId].expressions;
         if (expressions) {
-            for (let ii = 0; ii < expressions.length; ii++) {
+            for (var ii = 0; ii < expressions.length; ii++) {
                 if (expressions[ii].targetProperty === 'matcher') {
-                    const matcherBindingExpression = expressions[ii];
+                    var matcherBindingExpression = expressions[ii];
                     expressions.splice(ii, 1);
                     return matcherBindingExpression;
                 }
@@ -18274,9 +18407,29 @@ const extractMatcherBindingExpression = (instructions, targetedElementId) => {
         }
     }
 };
+var getChildrenCount = function (el) {
+    var childNodes = el.childNodes;
+    var count = 0;
+    for (var i = 0, ii = childNodes.length; ii > i; ++i) {
+        if (childNodes[i].nodeType === 1) {
+            ++count;
+        }
+    }
+    return count;
+};
+var getFirstElementChild = function (el) {
+    var firstChild = el.firstChild;
+    while (firstChild !== null) {
+        if (firstChild.nodeType === 1) {
+            return firstChild;
+        }
+        firstChild = firstChild.nextSibling;
+    }
+    return null;
+};
 
-const aureliaHideClassName = 'aurelia-hide';
-const aureliaHideClass = `.${aureliaHideClassName} { display:none !important; }`;
+var aureliaHideClassName = 'aurelia-hide';
+var aureliaHideClass = "." + aureliaHideClassName + " { display:none !important; }";
 function injectAureliaHideStyleAtHead() {
     __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(aureliaHideClass);
 }
@@ -18287,152 +18440,158 @@ function injectAureliaHideStyleAtBoundary(domBoundary) {
     }
 }
 
-let Show = class Show {
-    constructor(element, animator, domBoundary) {
+var Show = (function () {
+    function Show(element, animator, domBoundary) {
         this.element = element;
         this.animator = animator;
         this.domBoundary = domBoundary;
     }
-    static inject() {
+    Show.inject = function () {
         return [__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].Element, __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["Animator"], __WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["Optional"].of(__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].boundary, true)];
-    }
-    created() {
+    };
+    Show.prototype.created = function () {
         injectAureliaHideStyleAtBoundary(this.domBoundary);
-    }
-    valueChanged(newValue) {
-        let element = this.element;
-        let animator = this.animator;
+    };
+    Show.prototype.valueChanged = function (newValue) {
+        var element = this.element;
+        var animator = this.animator;
         if (newValue) {
             animator.removeClass(element, aureliaHideClassName);
         }
         else {
             animator.addClass(element, aureliaHideClassName);
         }
-    }
-    bind(bindingContext) {
+    };
+    Show.prototype.bind = function (bindingContext) {
         this.valueChanged(this.value);
-    }
-};
-Show = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('show')
-], Show);
+    };
+    Show = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('show')
+    ], Show);
+    return Show;
+}());
 
-let Hide = class Hide {
-    constructor(element, animator, domBoundary) {
+var Hide = (function () {
+    function Hide(element, animator, domBoundary) {
         this.element = element;
         this.animator = animator;
         this.domBoundary = domBoundary;
     }
-    static inject() {
+    Hide.inject = function () {
         return [__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].Element, __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["Animator"], __WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["Optional"].of(__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].boundary, true)];
-    }
-    created() {
+    };
+    Hide.prototype.created = function () {
         injectAureliaHideStyleAtBoundary(this.domBoundary);
-    }
-    valueChanged(newValue) {
+    };
+    Hide.prototype.valueChanged = function (newValue) {
         if (newValue) {
             this.animator.addClass(this.element, aureliaHideClassName);
         }
         else {
             this.animator.removeClass(this.element, aureliaHideClassName);
         }
-    }
-    bind(bindingContext) {
+    };
+    Hide.prototype.bind = function (bindingContext) {
         this.valueChanged(this.value);
-    }
-    value(value) {
+    };
+    Hide.prototype.value = function (value) {
         throw new Error('Method not implemented.');
-    }
-};
-Hide = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('hide')
-], Hide);
+    };
+    Hide = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('hide')
+    ], Hide);
+    return Hide;
+}());
 
-const SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-let needsToWarn = true;
-class HTMLSanitizer {
-    sanitize(input) {
+var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+var needsToWarn = true;
+var HTMLSanitizer = (function () {
+    function HTMLSanitizer() {
+    }
+    HTMLSanitizer.prototype.sanitize = function (input) {
         if (needsToWarn) {
             needsToWarn = false;
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5_aurelia_logging__["getLogger"])('html-sanitizer')
-                .warn(`CAUTION: The default HTMLSanitizer does NOT provide security against a wide variety of sophisticated XSS attacks,
-and should not be relied on for sanitizing input from unknown sources.
-Please see https://aurelia.io/docs/binding/basics#element-content for instructions on how to use a secure solution like DOMPurify or sanitize-html.`);
+                .warn("CAUTION: The default HTMLSanitizer does NOT provide security against a wide variety of sophisticated XSS attacks,\nand should not be relied on for sanitizing input from unknown sources.\nPlease see https://aurelia.io/docs/binding/basics#element-content for instructions on how to use a secure solution like DOMPurify or sanitize-html.");
         }
         return input.replace(SCRIPT_REGEX, '');
-    }
-}
+    };
+    return HTMLSanitizer;
+}());
 
-let SanitizeHTMLValueConverter = class SanitizeHTMLValueConverter {
-    constructor(sanitizer) {
+var SanitizeHTMLValueConverter = (function () {
+    function SanitizeHTMLValueConverter(sanitizer) {
         this.sanitizer = sanitizer;
     }
-    toView(untrustedMarkup) {
+    SanitizeHTMLValueConverter.prototype.toView = function (untrustedMarkup) {
         if (untrustedMarkup === null || untrustedMarkup === undefined) {
             return null;
         }
         return this.sanitizer.sanitize(untrustedMarkup);
-    }
-};
-SanitizeHTMLValueConverter = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["valueConverter"])('sanitizeHTML'),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(HTMLSanitizer)
-], SanitizeHTMLValueConverter);
+    };
+    SanitizeHTMLValueConverter = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["valueConverter"])('sanitizeHTML'),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(HTMLSanitizer)
+    ], SanitizeHTMLValueConverter);
+    return SanitizeHTMLValueConverter;
+}());
 
-let Replaceable = class Replaceable {
-    constructor(viewFactory, viewSlot) {
+var Replaceable = (function () {
+    function Replaceable(viewFactory, viewSlot) {
         this.viewFactory = viewFactory;
         this.viewSlot = viewSlot;
         this.view = null;
     }
-    bind(bindingContext, overrideContext) {
+    Replaceable.prototype.bind = function (bindingContext, overrideContext) {
         if (this.view === null) {
             this.view = this.viewFactory.create();
             this.viewSlot.add(this.view);
         }
         this.view.bind(bindingContext, overrideContext);
-    }
-    unbind() {
+    };
+    Replaceable.prototype.unbind = function () {
         this.view.unbind();
-    }
-};
-Replaceable = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('replaceable'),
-    __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
-], Replaceable);
+    };
+    Replaceable = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('replaceable'),
+        __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["templateController"],
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_aurelia_dependency_injection__["inject"])(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["BoundViewFactory"], __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewSlot"])
+    ], Replaceable);
+    return Replaceable;
+}());
 
-let Focus = class Focus {
-    constructor(element, taskQueue) {
+var Focus = (function () {
+    function Focus(element, taskQueue) {
         this.element = element;
         this.taskQueue = taskQueue;
         this.isAttached = false;
         this.needsApply = false;
     }
-    static inject() {
+    Focus.inject = function () {
         return [__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].Element, __WEBPACK_IMPORTED_MODULE_2_aurelia_task_queue__["TaskQueue"]];
-    }
-    valueChanged(newValue) {
+    };
+    Focus.prototype.valueChanged = function (newValue) {
         if (this.isAttached) {
             this._apply();
         }
         else {
             this.needsApply = true;
         }
-    }
-    _apply() {
+    };
+    Focus.prototype._apply = function () {
+        var _this = this;
         if (this.value) {
-            this.taskQueue.queueMicroTask(() => {
-                if (this.value) {
-                    this.element.focus();
+            this.taskQueue.queueMicroTask(function () {
+                if (_this.value) {
+                    _this.element.focus();
                 }
             });
         }
         else {
             this.element.blur();
         }
-    }
-    attached() {
+    };
+    Focus.prototype.attached = function () {
         this.isAttached = true;
         if (this.needsApply) {
             this.needsApply = false;
@@ -18440,168 +18599,186 @@ let Focus = class Focus {
         }
         this.element.addEventListener('focus', this);
         this.element.addEventListener('blur', this);
-    }
-    detached() {
+    };
+    Focus.prototype.detached = function () {
         this.isAttached = false;
         this.element.removeEventListener('focus', this);
         this.element.removeEventListener('blur', this);
-    }
-    handleEvent(e) {
+    };
+    Focus.prototype.handleEvent = function (e) {
         if (e.type === 'focus') {
             this.value = true;
         }
         else if (__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].activeElement !== this.element) {
             this.value = false;
         }
-    }
-};
-Focus = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('focus', __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay)
-], Focus);
+    };
+    Focus = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customAttribute"])('focus', __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay)
+    ], Focus);
+    return Focus;
+}());
 
-let cssUrlMatcher = /url\((?!['"]data)([^)]+)\)/gi;
+var cssUrlMatcher = /url\((?!['"]data)([^)]+)\)/gi;
 function fixupCSSUrls(address, css) {
     if (typeof css !== 'string') {
-        throw new Error(`Failed loading required CSS file: ${address}`);
+        throw new Error("Failed loading required CSS file: " + address);
     }
-    return css.replace(cssUrlMatcher, (match, p1) => {
-        let quote = p1.charAt(0);
+    return css.replace(cssUrlMatcher, function (match, p1) {
+        var quote = p1.charAt(0);
         if (quote === '\'' || quote === '"') {
             p1 = p1.substr(1, p1.length - 2);
         }
         return 'url(\'' + __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7_aurelia_path__["relativeToFile"])(p1, address) + '\')';
     });
 }
-class CSSResource {
-    constructor(address) {
+var CSSResource = (function () {
+    function CSSResource(address) {
         this.address = address;
         this._scoped = null;
         this._global = false;
         this._alreadyGloballyInjected = false;
     }
-    initialize(container, Target) {
+    CSSResource.prototype.initialize = function (container, Target) {
         this._scoped = new Target(this);
-    }
-    register(registry, name) {
+    };
+    CSSResource.prototype.register = function (registry, name) {
         if (name === 'scoped') {
             registry.registerViewEngineHooks(this._scoped);
         }
         else {
             this._global = true;
         }
-    }
-    load(container) {
+    };
+    CSSResource.prototype.load = function (container) {
+        var _this = this;
         return container.get(__WEBPACK_IMPORTED_MODULE_6_aurelia_loader__["Loader"])
             .loadText(this.address)
-            .catch(err => null)
-            .then(text => {
-            text = fixupCSSUrls(this.address, text);
-            this._scoped.css = text;
-            if (this._global) {
-                this._alreadyGloballyInjected = true;
+            .catch(function (err) { return null; })
+            .then(function (text) {
+            text = fixupCSSUrls(_this.address, text);
+            _this._scoped.css = text;
+            if (_this._global) {
+                _this._alreadyGloballyInjected = true;
                 __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(text);
             }
         });
-    }
-}
-class CSSViewEngineHooks {
-    constructor(owner) {
+    };
+    return CSSResource;
+}());
+var CSSViewEngineHooks = (function () {
+    function CSSViewEngineHooks(owner) {
         this.owner = owner;
         this.css = null;
     }
-    beforeCompile(content, resources, instruction) {
+    CSSViewEngineHooks.prototype.beforeCompile = function (content, resources, instruction) {
         if (instruction.targetShadowDOM) {
             __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(this.css, content, true);
         }
         else if (__WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["FEATURE"].scopedCSS) {
-            let styleNode = __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(this.css, content, true);
+            var styleNode = __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(this.css, content, true);
             styleNode.setAttribute('scoped', 'scoped');
         }
         else if (this._global && !this.owner._alreadyGloballyInjected) {
             __WEBPACK_IMPORTED_MODULE_1_aurelia_pal__["DOM"].injectStyles(this.css);
             this.owner._alreadyGloballyInjected = true;
         }
-    }
-}
-function _createCSSResource(address) {
-    let ViewCSS = class ViewCSS extends CSSViewEngineHooks {
     };
-    ViewCSS = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["resource"])(new CSSResource(address))
-    ], ViewCSS);
+    return CSSViewEngineHooks;
+}());
+function _createCSSResource(address) {
+    var ViewCSS = (function (_super) {
+        __extends(ViewCSS, _super);
+        function ViewCSS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ViewCSS = __decorate([
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["resource"])(new CSSResource(address))
+        ], ViewCSS);
+        return ViewCSS;
+    }(CSSViewEngineHooks));
     return ViewCSS;
 }
 
-let AttrBindingBehavior = class AttrBindingBehavior {
-    bind(binding, source) {
+var AttrBindingBehavior = (function () {
+    function AttrBindingBehavior() {
+    }
+    AttrBindingBehavior.prototype.bind = function (binding, source) {
         binding.targetObserver = new __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["DataAttributeObserver"](binding.target, binding.targetProperty);
-    }
-    unbind(binding, source) {
-    }
-};
-AttrBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('attr')
-], AttrBindingBehavior);
+    };
+    AttrBindingBehavior.prototype.unbind = function (binding, source) {
+    };
+    AttrBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('attr')
+    ], AttrBindingBehavior);
+    return AttrBindingBehavior;
+}());
 
-let modeBindingBehavior = {
-    bind(binding, source, lookupFunctions) {
+var modeBindingBehavior = {
+    bind: function (binding, source, lookupFunctions) {
         binding.originalMode = binding.mode;
         binding.mode = this.mode;
     },
-    unbind(binding, source) {
+    unbind: function (binding, source) {
         binding.mode = binding.originalMode;
         binding.originalMode = null;
     }
 };
-let OneTimeBindingBehavior = class OneTimeBindingBehavior {
-    constructor() {
+var OneTimeBindingBehavior = (function () {
+    function OneTimeBindingBehavior() {
         this.mode = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].oneTime;
     }
-};
-OneTimeBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('oneTime')
-], OneTimeBindingBehavior);
-let OneWayBindingBehavior = class OneWayBindingBehavior {
-    constructor() {
+    OneTimeBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('oneTime')
+    ], OneTimeBindingBehavior);
+    return OneTimeBindingBehavior;
+}());
+var OneWayBindingBehavior = (function () {
+    function OneWayBindingBehavior() {
         this.mode = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].toView;
     }
-};
-OneWayBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('oneWay')
-], OneWayBindingBehavior);
-let ToViewBindingBehavior = class ToViewBindingBehavior {
-    constructor() {
+    OneWayBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('oneWay')
+    ], OneWayBindingBehavior);
+    return OneWayBindingBehavior;
+}());
+var ToViewBindingBehavior = (function () {
+    function ToViewBindingBehavior() {
         this.mode = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].toView;
     }
-};
-ToViewBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('toView')
-], ToViewBindingBehavior);
-let FromViewBindingBehavior = class FromViewBindingBehavior {
-    constructor() {
+    ToViewBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('toView')
+    ], ToViewBindingBehavior);
+    return ToViewBindingBehavior;
+}());
+var FromViewBindingBehavior = (function () {
+    function FromViewBindingBehavior() {
         this.mode = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].fromView;
     }
-};
-FromViewBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('fromView')
-], FromViewBindingBehavior);
-let TwoWayBindingBehavior = class TwoWayBindingBehavior {
-    constructor() {
+    FromViewBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('fromView')
+    ], FromViewBindingBehavior);
+    return FromViewBindingBehavior;
+}());
+var TwoWayBindingBehavior = (function () {
+    function TwoWayBindingBehavior() {
         this.mode = __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay;
     }
-};
-TwoWayBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('twoWay')
-], TwoWayBindingBehavior);
+    TwoWayBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8_aurelia_metadata__["mixin"])(modeBindingBehavior),
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('twoWay')
+    ], TwoWayBindingBehavior);
+    return TwoWayBindingBehavior;
+}());
 
 function throttle(newValue) {
-    let state = this.throttleState;
-    let elapsed = +new Date() - state.last;
+    var _this = this;
+    var state = this.throttleState;
+    var elapsed = +new Date() - state.last;
     if (elapsed >= state.delay) {
         clearTimeout(state.timeoutId);
         state.timeoutId = null;
@@ -18611,16 +18788,19 @@ function throttle(newValue) {
     }
     state.newValue = newValue;
     if (state.timeoutId === null) {
-        state.timeoutId = setTimeout(() => {
+        state.timeoutId = setTimeout(function () {
             state.timeoutId = null;
             state.last = +new Date();
-            this.throttledMethod(state.newValue);
+            _this.throttledMethod(state.newValue);
         }, state.delay - elapsed);
     }
 }
-let ThrottleBindingBehavior = class ThrottleBindingBehavior {
-    bind(binding, source, delay = 200) {
-        let methodToThrottle = 'updateTarget';
+var ThrottleBindingBehavior = (function () {
+    function ThrottleBindingBehavior() {
+    }
+    ThrottleBindingBehavior.prototype.bind = function (binding, source, delay) {
+        if (delay === void 0) { delay = 200; }
+        var methodToThrottle = 'updateTarget';
         if (binding.callSource) {
             methodToThrottle = 'callSource';
         }
@@ -18635,27 +18815,30 @@ let ThrottleBindingBehavior = class ThrottleBindingBehavior {
             last: 0,
             timeoutId: null
         };
-    }
-    unbind(binding, source) {
-        let methodToRestore = binding.throttledMethod.originalName;
+    };
+    ThrottleBindingBehavior.prototype.unbind = function (binding, source) {
+        var methodToRestore = binding.throttledMethod.originalName;
         binding[methodToRestore] = binding.throttledMethod;
         binding.throttledMethod = null;
         clearTimeout(binding.throttleState.timeoutId);
         binding.throttleState = null;
-    }
-};
-ThrottleBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('throttle')
-], ThrottleBindingBehavior);
+    };
+    ThrottleBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('throttle')
+    ], ThrottleBindingBehavior);
+    return ThrottleBindingBehavior;
+}());
 
-const unset = {};
+var unset = {};
 function debounceCallSource(event) {
-    const state = this.debounceState;
+    var _this = this;
+    var state = this.debounceState;
     clearTimeout(state.timeoutId);
-    state.timeoutId = setTimeout(() => this.debouncedMethod(event), state.delay);
+    state.timeoutId = setTimeout(function () { return _this.debouncedMethod(event); }, state.delay);
 }
 function debounceCall(context, newValue, oldValue) {
-    const state = this.debounceState;
+    var _this = this;
+    var state = this.debounceState;
     clearTimeout(state.timeoutId);
     if (context !== state.callContextToDebounce) {
         state.oldValue = unset;
@@ -18665,105 +18848,117 @@ function debounceCall(context, newValue, oldValue) {
     if (state.oldValue === unset) {
         state.oldValue = oldValue;
     }
-    state.timeoutId = setTimeout(() => {
-        const _oldValue = state.oldValue;
+    state.timeoutId = setTimeout(function () {
+        var _oldValue = state.oldValue;
         state.oldValue = unset;
-        this.debouncedMethod(context, newValue, _oldValue);
+        _this.debouncedMethod(context, newValue, _oldValue);
     }, state.delay);
 }
-let DebounceBindingBehavior = class DebounceBindingBehavior {
-    bind(binding, source, delay = 200) {
-        const isCallSource = binding.callSource !== undefined;
-        const methodToDebounce = isCallSource ? 'callSource' : 'call';
-        const debouncer = isCallSource ? debounceCallSource : debounceCall;
-        const mode = binding.mode;
-        const callContextToDebounce = mode === __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay || mode === __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].fromView ? __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["targetContext"] : __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["sourceContext"];
+var DebounceBindingBehavior = (function () {
+    function DebounceBindingBehavior() {
+    }
+    DebounceBindingBehavior.prototype.bind = function (binding, source, delay) {
+        if (delay === void 0) { delay = 200; }
+        var isCallSource = binding.callSource !== undefined;
+        var methodToDebounce = isCallSource ? 'callSource' : 'call';
+        var debouncer = isCallSource ? debounceCallSource : debounceCall;
+        var mode = binding.mode;
+        var callContextToDebounce = mode === __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay || mode === __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].fromView ? __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["targetContext"] : __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["sourceContext"];
         binding.debouncedMethod = binding[methodToDebounce];
         binding.debouncedMethod.originalName = methodToDebounce;
         binding[methodToDebounce] = debouncer;
         binding.debounceState = {
-            callContextToDebounce,
-            delay,
+            callContextToDebounce: callContextToDebounce,
+            delay: delay,
             timeoutId: 0,
             oldValue: unset
         };
-    }
-    unbind(binding, source) {
-        const methodToRestore = binding.debouncedMethod.originalName;
+    };
+    DebounceBindingBehavior.prototype.unbind = function (binding, source) {
+        var methodToRestore = binding.debouncedMethod.originalName;
         binding[methodToRestore] = binding.debouncedMethod;
         binding.debouncedMethod = null;
         clearTimeout(binding.debounceState.timeoutId);
         binding.debounceState = null;
-    }
-};
-DebounceBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('debounce')
-], DebounceBindingBehavior);
+    };
+    DebounceBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('debounce')
+    ], DebounceBindingBehavior);
+    return DebounceBindingBehavior;
+}());
 
 function findOriginalEventTarget(event) {
     return (event.path && event.path[0]) || (event.deepPath && event.deepPath[0]) || event.target;
 }
 function handleSelfEvent(event) {
-    let target = findOriginalEventTarget(event);
+    var target = findOriginalEventTarget(event);
     if (this.target !== target) {
         return;
     }
     this.selfEventCallSource(event);
 }
-let SelfBindingBehavior = class SelfBindingBehavior {
-    bind(binding, source) {
+var SelfBindingBehavior = (function () {
+    function SelfBindingBehavior() {
+    }
+    SelfBindingBehavior.prototype.bind = function (binding, source) {
         if (!binding.callSource || !binding.targetEvent) {
             throw new Error('Self binding behavior only supports event.');
         }
         binding.selfEventCallSource = binding.callSource;
         binding.callSource = handleSelfEvent;
-    }
-    unbind(binding, source) {
+    };
+    SelfBindingBehavior.prototype.unbind = function (binding, source) {
         binding.callSource = binding.selfEventCallSource;
         binding.selfEventCallSource = null;
-    }
-};
-SelfBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('self')
-], SelfBindingBehavior);
+    };
+    SelfBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('self')
+    ], SelfBindingBehavior);
+    return SelfBindingBehavior;
+}());
 
-class BindingSignaler {
-    constructor() {
+var BindingSignaler = (function () {
+    function BindingSignaler() {
         this.signals = {};
     }
-    signal(name) {
-        let bindings = this.signals[name];
+    BindingSignaler.prototype.signal = function (name) {
+        var bindings = this.signals[name];
         if (!bindings) {
             return;
         }
-        let i = bindings.length;
+        var i = bindings.length;
         while (i--) {
             bindings[i].call(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["sourceContext"]);
         }
-    }
-}
+    };
+    return BindingSignaler;
+}());
 
-let SignalBindingBehavior = class SignalBindingBehavior {
-    constructor(bindingSignaler) {
+var SignalBindingBehavior = (function () {
+    function SignalBindingBehavior(bindingSignaler) {
         this.signals = bindingSignaler.signals;
     }
-    static inject() { return [BindingSignaler]; }
-    bind(binding, source, ...names) {
+    SignalBindingBehavior.inject = function () { return [BindingSignaler]; };
+    SignalBindingBehavior.prototype.bind = function (binding, source) {
+        var names = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            names[_i - 2] = arguments[_i];
+        }
         if (!binding.updateTarget) {
             throw new Error('Only property bindings and string interpolation bindings can be signaled.  Trigger, delegate and call bindings cannot be signaled.');
         }
-        let signals = this.signals;
+        var signals = this.signals;
         if (names.length === 1) {
-            let name = names[0];
-            let bindings = signals[name] || (signals[name] = []);
+            var name_1 = names[0];
+            var bindings = signals[name_1] || (signals[name_1] = []);
             bindings.push(binding);
-            binding.signalName = name;
+            binding.signalName = name_1;
         }
         else if (names.length > 1) {
-            let i = names.length;
+            var i = names.length;
             while (i--) {
-                let name = names[i];
-                let bindings = signals[name] || (signals[name] = []);
+                var name_2 = names[i];
+                var bindings = signals[name_2] || (signals[name_2] = []);
                 bindings.push(binding);
             }
             binding.signalName = names;
@@ -18771,71 +18966,83 @@ let SignalBindingBehavior = class SignalBindingBehavior {
         else {
             throw new Error('Signal name is required.');
         }
-    }
-    unbind(binding, source) {
-        let signals = this.signals;
-        let name = binding.signalName;
+    };
+    SignalBindingBehavior.prototype.unbind = function (binding, source) {
+        var signals = this.signals;
+        var name = binding.signalName;
         binding.signalName = null;
         if (Array.isArray(name)) {
-            let names = name;
-            let i = names.length;
+            var names = name;
+            var i = names.length;
             while (i--) {
-                let n = names[i];
-                let bindings = signals[n];
+                var n = names[i];
+                var bindings = signals[n];
                 bindings.splice(bindings.indexOf(binding), 1);
             }
         }
         else {
-            let bindings = signals[name];
+            var bindings = signals[name];
             bindings.splice(bindings.indexOf(binding), 1);
         }
-    }
-};
-SignalBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('signal')
-], SignalBindingBehavior);
+    };
+    SignalBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('signal')
+    ], SignalBindingBehavior);
+    return SignalBindingBehavior;
+}());
 
-const eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
-const notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way/ from-view bindings on input/select elements.';
-let UpdateTriggerBindingBehavior = class UpdateTriggerBindingBehavior {
-    bind(binding, source, ...events) {
+var eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
+var notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way/ from-view bindings on input/select elements.';
+var UpdateTriggerBindingBehavior = (function () {
+    function UpdateTriggerBindingBehavior() {
+    }
+    UpdateTriggerBindingBehavior.prototype.bind = function (binding, source) {
+        var events = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            events[_i - 2] = arguments[_i];
+        }
         if (events.length === 0) {
             throw new Error(eventNamesRequired);
         }
         if (binding.mode !== __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].twoWay && binding.mode !== __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingMode"].fromView) {
             throw new Error(notApplicableMessage);
         }
-        let targetObserver = binding.observerLocator.getObserver(binding.target, binding.targetProperty);
+        var targetObserver = binding.observerLocator.getObserver(binding.target, binding.targetProperty);
         if (!targetObserver.handler) {
             throw new Error(notApplicableMessage);
         }
         binding.targetObserver = targetObserver;
         targetObserver.originalHandler = binding.targetObserver.handler;
-        let handler = new __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["EventSubscriber"](events);
+        var handler = new __WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["EventSubscriber"](events);
         targetObserver.handler = handler;
-    }
-    unbind(binding, source) {
-        let targetObserver = binding.targetObserver;
+    };
+    UpdateTriggerBindingBehavior.prototype.unbind = function (binding, source) {
+        var targetObserver = binding.targetObserver;
         targetObserver.handler.dispose();
         targetObserver.handler = targetObserver.originalHandler;
         targetObserver.originalHandler = null;
-    }
-};
-UpdateTriggerBindingBehavior = __decorate([
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('updateTrigger')
-], UpdateTriggerBindingBehavior);
-
-function _createDynamicElement({ name, viewUrl, bindableNames, useShadowDOMmode }) {
-    let DynamicElement = class DynamicElement {
-        bind(bindingContext) {
-            this.$parent = bindingContext;
-        }
     };
-    DynamicElement = __decorate([
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customElement"])(name),
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["useView"])(viewUrl)
-    ], DynamicElement);
-    for (let i = 0, ii = bindableNames.length; i < ii; ++i) {
+    UpdateTriggerBindingBehavior = __decorate([
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4_aurelia_binding__["bindingBehavior"])('updateTrigger')
+    ], UpdateTriggerBindingBehavior);
+    return UpdateTriggerBindingBehavior;
+}());
+
+function _createDynamicElement(_a) {
+    var name = _a.name, viewUrl = _a.viewUrl, bindableNames = _a.bindableNames, useShadowDOMmode = _a.useShadowDOMmode;
+    var DynamicElement = (function () {
+        function DynamicElement() {
+        }
+        DynamicElement.prototype.bind = function (bindingContext) {
+            this.$parent = bindingContext;
+        };
+        DynamicElement = __decorate([
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["customElement"])(name),
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["useView"])(viewUrl)
+        ], DynamicElement);
+        return DynamicElement;
+    }());
+    for (var i = 0, ii = bindableNames.length; i < ii; ++i) {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["bindable"])(bindableNames[i])(DynamicElement);
     }
     switch (useShadowDOMmode) {
@@ -18852,7 +19059,7 @@ function _createDynamicElement({ name, viewUrl, bindableNames, useShadowDOMmode 
             break;
         default:
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5_aurelia_logging__["getLogger"])('aurelia-html-only-element')
-                .warn(`Expected 'use-shadow-dom' value to be "close", "open" or "", received ${useShadowDOMmode}`);
+                .warn("Expected 'use-shadow-dom' value to be \"close\", \"open\" or \"\", received " + useShadowDOMmode);
             break;
     }
     return DynamicElement;
@@ -18862,22 +19069,23 @@ function getElementName(address) {
     return /([^\/^\?]+)\.html/i.exec(address)[1].toLowerCase();
 }
 function configure(config) {
-    const viewEngine = config.container.get(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewEngine"]);
-    const loader = config.aurelia.loader;
+    var viewEngine = config.container.get(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewEngine"]);
+    var loader = config.aurelia.loader;
     viewEngine.addResourcePlugin('.html', {
         'fetch': function (viewUrl) {
-            return loader.loadTemplate(viewUrl).then(registryEntry => {
-                let bindableNames = registryEntry.template.getAttribute('bindable');
-                const useShadowDOMmode = registryEntry.template.getAttribute('use-shadow-dom');
-                const name = getElementName(viewUrl);
+            return loader.loadTemplate(viewUrl).then(function (registryEntry) {
+                var _a;
+                var bindableNames = registryEntry.template.getAttribute('bindable');
+                var useShadowDOMmode = registryEntry.template.getAttribute('use-shadow-dom');
+                var name = getElementName(viewUrl);
                 if (bindableNames) {
-                    bindableNames = bindableNames.split(',').map(x => x.trim());
+                    bindableNames = bindableNames.split(',').map(function (x) { return x.trim(); });
                     registryEntry.template.removeAttribute('bindable');
                 }
                 else {
                     bindableNames = [];
                 }
-                return { [name]: _createDynamicElement({ name, viewUrl, bindableNames, useShadowDOMmode }) };
+                return _a = {}, _a[name] = _createDynamicElement({ name: name, viewUrl: viewUrl, bindableNames: bindableNames, useShadowDOMmode: useShadowDOMmode }), _a;
             });
         }
     });
@@ -18887,13 +19095,14 @@ function configure$1(config) {
     injectAureliaHideStyleAtHead();
     config.globalResources(Compose, If, Else, With, Repeat, Show, Hide, Replaceable, Focus, SanitizeHTMLValueConverter, OneTimeBindingBehavior, OneWayBindingBehavior, ToViewBindingBehavior, FromViewBindingBehavior, TwoWayBindingBehavior, ThrottleBindingBehavior, DebounceBindingBehavior, SelfBindingBehavior, SignalBindingBehavior, UpdateTriggerBindingBehavior, AttrBindingBehavior);
     configure(config);
-    let viewEngine = config.container.get(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewEngine"]);
-    let styleResourcePlugin = {
-        fetch(address) {
-            return { [address]: _createCSSResource(address) };
+    var viewEngine = config.container.get(__WEBPACK_IMPORTED_MODULE_3_aurelia_templating__["ViewEngine"]);
+    var styleResourcePlugin = {
+        fetch: function (address) {
+            var _a;
+            return _a = {}, _a[address] = _createCSSResource(address), _a;
         }
     };
-    ['.css', '.less', '.sass', '.scss', '.styl'].forEach(ext => viewEngine.addResourcePlugin(ext, styleResourcePlugin));
+    ['.css', '.less', '.sass', '.scss', '.styl'].forEach(function (ext) { return viewEngine.addResourcePlugin(ext, styleResourcePlugin); });
 }
 
 
@@ -18911,9 +19120,9 @@ function configure$1(config) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_aurelia_metadata__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_aurelia_path__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_aurelia_templating__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_dependency_injection__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_aurelia_dependency_injection__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_aurelia_binding__ = __webpack_require__("aurelia-binding");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_aurelia_pal__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_aurelia_pal__ = __webpack_require__(27);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7_aurelia_logging__ = __webpack_require__(50);
 /* harmony export (binding) */ __webpack_require__.d(exports, "RouteHref", function() { return RouteHref; });
 /* harmony export (binding) */ __webpack_require__.d(exports, "RouterView", function() { return RouterView; });
@@ -19308,5 +19517,5 @@ function configure(config) {
 
 /***/ }
 
-},[1021]);
-//# sourceMappingURL=aurelia.b6242db6bf2f8773c521.bundle.map
+},[1034]);
+//# sourceMappingURL=aurelia.e74b956ddd279c7e248a.bundle.map

@@ -1,1 +1,0 @@
-# mm-pos-ui.github.io
